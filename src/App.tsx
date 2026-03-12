@@ -1,57 +1,42 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
-import Home from "./pages/Home";
-import SignUp from "./pages/SignUp";
 import NotFound from "./pages/NotFound";
-import UserDashboard from "./pages/user/UserDashboard";
-import { UserAuth } from "./auth/UserAuth.tsx";
 import { AdminAuth } from "./auth/AdminAuth.tsx";
-import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
-import FacialRecognition from "./pages/user/FacialRecognition.tsx";
-import DashboardLayout from "./components/dashboard/admin/DashboardLayout.tsx";
-import StaffMgt from "./pages/admin/StaffMgt.tsx";
-import Holiday from "./pages/admin/Holiday.tsx";
+import Login from "./pages/Login.tsx";
+import DashboardLayout from "./components/layout/DashboardLayout.tsx";
+import Overview from "./pages/dashboard/Overview.tsx";
+import Employees from "./pages/dashboard/Employees.tsx";
+import GradeLevels from "./pages/dashboard/GradeLevels.tsx";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route index element={<Home />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/face-recognition" element={<FacialRecognition />} />
+        <Route index element={<Login />} />
         <Route path="*" element={<NotFound />} />
-        {/* user routes */}
-        <Route
-          path="/usr/d"
-          element={
-            <UserAuth>
-              <UserDashboard />
-            </UserAuth>
-          }
-        />
-        {/* admin routes */}
+        {/* protected routes */}
         <Route element={<DashboardLayout />}>
           <Route
-            path="/adm/d"
+            path="/d"
             element={
               <AdminAuth>
-                <AdminDashboard />
+                <Overview />
               </AdminAuth>
             }
           />
           <Route
-            path="/adm/d/mgt"
+            path="/d/employees"
             element={
               <AdminAuth>
-                <StaffMgt />
+                <Employees />
               </AdminAuth>
             }
           />
           <Route
-            path="/adm/d/holidays"
+            path="/d/grade-levels"
             element={
               <AdminAuth>
-                <Holiday />
+                <GradeLevels />
               </AdminAuth>
             }
           />
