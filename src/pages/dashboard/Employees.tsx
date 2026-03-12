@@ -4,6 +4,7 @@ import { CiSearch } from "react-icons/ci";
 import { HiOutlinePlus } from "react-icons/hi";
 import { BsChevronDown } from "react-icons/bs";
 import EmployeesTable from "../../components/tables/EmployeesTable";
+import AddNewEmployee from "../../components/modals/employees-page/AddNewEmployee";
 
 export default function Employees() {
   return (
@@ -34,6 +35,8 @@ export default function Employees() {
       <section className="bg-white mt-10 relative">
         <EmployeesTable />
       </section>
+      {/* add new employee modal */}
+      <AddNewEmployee />
     </section>
   );
 }

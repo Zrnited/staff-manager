@@ -38,6 +38,7 @@ export default function Login() {
 
     setCookie("sessionId", id);
     navigate("/d", { replace: true });
+    toast.success("Login successful");
   };
 
   return (

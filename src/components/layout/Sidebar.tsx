@@ -1,6 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineLogout } from "react-icons/ai";
-import { toast } from "sonner";
 import { navLinks } from "../../constants";
 import { deleteCookie } from "../../utils";
 
@@ -15,7 +14,6 @@ export default function Sidebar({ sidenav, setSidenav }: Props) {
 
   const logOut = () => {
     deleteCookie("sessionId");
-    toast.success("Logout Successful");
     navigate("/", { replace: true });
   };
 
@@ -28,7 +26,7 @@ export default function Sidebar({ sidenav, setSidenav }: Props) {
       <section>
         <div className="w-full flex flex-col text-white">
           <h2 className="font-semibold text-2xl font-grotesk">
-            <span className="text-[#2A9290]">HR</span> Manager
+            <span className="text-[#2A9290]">Staff</span> Manager
           </h2>
           <hr className="h-px border-none bg-[#2A313c] w-full mt-6" />
         </div>
@@ -54,7 +52,7 @@ export default function Sidebar({ sidenav, setSidenav }: Props) {
         </ul>
       </section>
       <section className="space-y-3 mt-5">
-        <hr className="h-px border-none bg-[#E0E0E0] w-full mb-6" />
+        <hr className="h-px border-none bg-[#2A313c] w-full mt-6" />
         <button
           onClick={logOut}
           className="flex items-center gap-x-3 transition ease-in-out text-white delay-100 w-full p-3 rounded-xl font-semibold cursor-pointer hover:bg-[#FF383C] hover:text-white text-lg lg:text-base"
