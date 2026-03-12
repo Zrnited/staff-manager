@@ -10,3 +10,13 @@ export type NavLinks = {
   title: string;
   path: string;
 };
+
+export type Employee = {
+  id: string;
+  name: string;
+  role: string;
+  department: string;
+  location: string;
+  grade: string;
+  createdAt: string;
+};
