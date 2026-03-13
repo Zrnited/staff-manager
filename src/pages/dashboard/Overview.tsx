@@ -9,7 +9,7 @@ export default function Overview() {
     <section className="space-y-5 lg:space-y-7 lg:px-5 lg:py-4">
       <SectionHeader
         heading="dashboard"
-        subHeading="Organization overview at a glance."
+        subHeading="Organization overview at a glance"
       />
       {/* cards */}
       <div className="flex items-center">

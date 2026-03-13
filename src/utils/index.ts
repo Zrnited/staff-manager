@@ -22,3 +22,20 @@ export const fetchCookie = (key: string) => {
   const cookie = Cookies.get(key);
   return cookie;
 };
+
+//local storage logics
+export const setStorage = (key: string, value: unknown) => {
+  localStorage.setItem(key, JSON.stringify(value));
+};
+
+export const getStorage = <T>(key: string): T | null => {
+  const item = localStorage.getItem(key);
+
+  if (!item) return null;
+
+  return JSON.parse(item) as T;
+};
+
+export const removeStorage = (key: string) => {
+  localStorage.removeItem(key);
+};

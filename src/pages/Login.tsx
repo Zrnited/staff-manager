@@ -1,6 +1,7 @@
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { useAppContext } from "../context";
 import { useState } from "react";
-import type { LoginForm } from "../types";
+import type { LoginForm, User } from "../types";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { setCookie } from "../utils";
@@ -8,12 +9,16 @@ import { v4 as uuidv4 } from "uuid";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { setUser } = useAppContext();
   const [form, setForm] = useState<LoginForm>({
     email: "",
     password: "",
   });
   const [showPass, setShowPass] = useState<boolean>(false);
-  const accesscred = {
+  const userId = uuidv4();
+  const accesscred: User = {
+    id: userId,
+    name: "Head of Department",
     email: "admin@email.com",
     password: "123456",
   };
@@ -37,6 +42,7 @@ export default function Login() {
     const id = uuidv4();
 
     setCookie("sessionId", id);
+    setUser(accesscred);
     navigate("/d", { replace: true });
     toast.success("Login successful");
   };

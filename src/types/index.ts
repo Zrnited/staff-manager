@@ -1,5 +1,12 @@
 import type { IconType } from "react-icons/lib";
 
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+};
+
 export type LoginForm = {
   email: string;
   password: string;
@@ -16,7 +23,16 @@ export type Employee = {
   name: string;
   role: string;
   department: string;
-  location: string;
+  country: string;
+  state: string;
+  address: string;
   grade: string;
+  createdAt: string;
+};
+
+export type GradeLevel = {
+  id: string;
+  name: string;
+  description: string;
   createdAt: string;
 };

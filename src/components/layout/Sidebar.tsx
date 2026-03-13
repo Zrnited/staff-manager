@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineLogout } from "react-icons/ai";
 import { navLinks } from "../../constants";
-import { deleteCookie } from "../../utils";
+import { deleteCookie, removeStorage } from "../../utils";
 
 interface Props {
   sidenav: boolean;
@@ -15,6 +15,8 @@ export default function Sidebar({ sidenav, setSidenav }: Props) {
   const logOut = () => {
     deleteCookie("sessionId");
     navigate("/", { replace: true });
+    removeStorage("gradeLevels");
+    removeStorage("employees");
   };
 
   return (
