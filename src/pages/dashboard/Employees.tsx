@@ -5,6 +5,8 @@ import { HiOutlinePlus } from "react-icons/hi";
 import { BsChevronDown } from "react-icons/bs";
 import EmployeesTable from "../../components/tables/EmployeesTable";
 import AddNewEmployee from "../../components/modals/employees-page/AddNewEmployee";
+import EmployeeInfo from "../../components/modals/employees-page/EmployeeInfo";
+import DeleteConfirmation from "../../components/modals/employees-page/DeleteConfirmation";
 
 export default function Employees() {
   return (
@@ -37,6 +39,11 @@ export default function Employees() {
       </section>
       {/* add new employee modal */}
       <AddNewEmployee />
+      <EmployeeInfo />
+      <DeleteConfirmation
+        title="Delete Employee"
+        desc="Are you sure you want to delete Kolawole Mayhorz? This action cannot be undone."
+      />
     </section>
   );
 }

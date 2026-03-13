@@ -4,6 +4,9 @@ import SectionHeader from "../../components/ui/SectionHeader";
 import { LuUsers, LuUserRoundPlus } from "react-icons/lu";
 import { RiDeleteBinLine } from "react-icons/ri";
 import EmptySet from "../../components/ui/EmptySet";
+import CreateGradeLevel from "../../components/modals/grade-levels-page/CreateGradeLevel";
+import DeleteConfirmation from "../../components/modals/employees-page/DeleteConfirmation";
+import GradeLevelAssign from "../../components/modals/grade-levels-page/GradeLevelAssign";
 
 export default function GradeLevels() {
   return (
@@ -81,6 +84,12 @@ export default function GradeLevels() {
       </div>
       {/* notifications */}
       <EmptySet text="No grade levels yet. Create one to start categorizing employees." />
+      <CreateGradeLevel />
+      <DeleteConfirmation
+        title="Delete Grade Level"
+        desc={`"Delete "LVL1"? Employees in this grade will become unassigned.`}
+      />
+      <GradeLevelAssign />
     </section>
   );
 }
