@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAppContext } from "../../context";
 import { AiOutlineLogout } from "react-icons/ai";
 import { navLinks } from "../../constants";
 import { deleteCookie, removeStorage } from "../../utils";
@@ -10,6 +11,7 @@ interface Props {
 
 export default function Sidebar({ sidenav, setSidenav }: Props) {
   const { pathname } = useLocation();
+  const { setEmployees, setGradeLevels } = useAppContext();
   const navigate = useNavigate();
 
   const logOut = () => {
@@ -17,6 +19,8 @@ export default function Sidebar({ sidenav, setSidenav }: Props) {
     navigate("/", { replace: true });
     removeStorage("gradeLevels");
     removeStorage("employees");
+    setEmployees([]);
+    setGradeLevels([]);
   };
 
   return (

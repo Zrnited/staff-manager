@@ -9,6 +9,7 @@ import {
 } from "react";
 import type { Employee, GradeLevel, User } from "../types";
 import { setStorage } from "../utils";
+import Cookies from "js-cookie";
 
 interface AppContextTypes {
   employees: Employee[];
@@ -33,7 +34,6 @@ const AppContext = createContext<AppContextTypes>(defaultContextValues);
 export const ContextProvider = ({ children }: { children: ReactNode }) => {
   //onboarding
   const [user, setUser] = useState<User>();
-  console.log(user);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [gradeLevels, setGradeLevels] = useState<GradeLevel[]>([]);
 
@@ -43,6 +43,13 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
     setStorage("employees", employees);
     setStorage("gradeLevels", gradeLevels);
   }, [user]);
+
+  //handle state change sync with local storage
+  useEffect(() => {
+    const token = Cookies.get("sessionId");
+    if (!token) return;
+    setStorage("employees", employees);
+  }, [employees]);
 
   const value = {
     employees,
