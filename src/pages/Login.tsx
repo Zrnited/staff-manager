@@ -16,9 +16,10 @@ export default function Login() {
   });
   const [showPass, setShowPass] = useState<boolean>(false);
   const userId = uuidv4();
+
   const accesscred: User = {
     id: userId,
-    name: "Head of Department",
+    name: "Chief HR Manager",
     email: "admin@email.com",
     password: "123456",
   };

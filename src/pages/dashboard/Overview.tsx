@@ -3,8 +3,10 @@ import OverviewCard from "../../components/ui/OverviewCard";
 import { FiUserCheck } from "react-icons/fi";
 import EmptySet from "../../components/ui/EmptySet";
 import SectionHeader from "../../components/ui/SectionHeader";
+import { useAppContext } from "../../context";
 
 export default function Overview() {
+  const { employees, gradeLevels } = useAppContext();
   return (
     <section className="space-y-5 lg:space-y-7 lg:px-5 lg:py-4">
       <SectionHeader
@@ -18,7 +20,7 @@ export default function Overview() {
           <OverviewCard
             cardTitle="total employees"
             cardColor="#2A9290"
-            count={1}
+            count={employees.length}
             IconName={LuUsers}
             path="/d/employees"
           />
@@ -26,7 +28,7 @@ export default function Overview() {
           <OverviewCard
             cardTitle="grade levels"
             cardColor="#F1BE0E"
-            count={0}
+            count={gradeLevels.length}
             IconName={LuAward}
             path="/d/grade-levels"
           />

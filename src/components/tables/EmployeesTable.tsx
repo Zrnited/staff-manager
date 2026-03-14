@@ -1,8 +1,9 @@
-import { fakeEmployees } from "../../constants";
 import { FiEye, FiEdit2 } from "react-icons/fi";
 import { RiDeleteBinLine } from "react-icons/ri";
+import { useAppContext } from "../../context";
 
 export default function EmployeesTable() {
+  const { employees } = useAppContext();
   const headings = [
     {
       name: "Name",
@@ -47,7 +48,7 @@ export default function EmployeesTable() {
           })}
         </tr>
       </thead>
-      {fakeEmployees.length !== 0 ? (
+      {employees.length === 0 ? (
         <div className="h-30 flex items-center justify-center text-center w-full align-middle text-[#8a7d8f] text-sm md:text-base">
           <p className="absolute w-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mt-8">
             No employees yet. Click 'Add Employee' to get started
@@ -55,7 +56,7 @@ export default function EmployeesTable() {
         </div>
       ) : (
         <tbody className="rounded-b-lg py-2">
-          {fakeEmployees.map((staff, index) => {
+          {employees.map((staff, index) => {
             return (
               <tr
                 className="font-normal h-16 lg:h-20 border-b border-b-[#D9D9D9] text-[#232323] hover:bg-gray-50"
@@ -71,8 +72,10 @@ export default function EmployeesTable() {
                 </td>
                 <td className="hidden lg:table-cell">{staff.role}</td>
                 <td className="hidden lg:table-cell">{staff.department}</td>
-                <td className="hidden lg:table-cell">{staff.location}</td>
-                <td className="hidden sm:table-cell">{staff.grade}</td>
+                <td className="hidden lg:table-cell">{staff.state}</td>
+                <td className="hidden capitalize sm:table-cell">
+                  {staff.grade}
+                </td>
                 <td className="w-auto">
                   <div className="flex w-fit items-center gap-2">
                     <button className="bg-inherit hover:bg-[#2A9290]/20 hover:text-[#2A9290] cursor-pointer p-2 rounded-sm transition ease-in-out delay-100 w-fit lg:p-3">

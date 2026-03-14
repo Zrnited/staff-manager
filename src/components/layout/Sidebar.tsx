@@ -11,16 +11,17 @@ interface Props {
 
 export default function Sidebar({ sidenav, setSidenav }: Props) {
   const { pathname } = useLocation();
-  const { setEmployees, setGradeLevels } = useAppContext();
+  const { setEmployees, setGradeLevels, setUser } = useAppContext();
   const navigate = useNavigate();
 
   const logOut = () => {
     deleteCookie("sessionId");
-    navigate("/", { replace: true });
     removeStorage("gradeLevels");
     removeStorage("employees");
     setEmployees([]);
     setGradeLevels([]);
+    setUser(undefined);
+    navigate("/", { replace: true });
   };
 
   return (

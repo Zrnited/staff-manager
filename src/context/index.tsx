@@ -8,8 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Employee, GradeLevel, User } from "../types";
-import { setStorage } from "../utils";
-import Cookies from "js-cookie";
+import { getStorage, setStorage } from "../utils";
 
 interface AppContextTypes {
   employees: Employee[];
@@ -33,22 +32,37 @@ const AppContext = createContext<AppContextTypes>(defaultContextValues);
 
 export const ContextProvider = ({ children }: { children: ReactNode }) => {
   //onboarding
-  const [user, setUser] = useState<User>();
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [gradeLevels, setGradeLevels] = useState<GradeLevel[]>([]);
+  const [user, setUser] = useState(() => {
+    const exisUser: User | null = getStorage("user");
+    return exisUser ? exisUser : undefined;
+  });
 
-  //initialize states to database
+  //employee list state
+  const [employees, setEmployees] = useState(() => {
+    const exisEmployees: Employee[] | null = getStorage("employees");
+    return exisEmployees ? exisEmployees : [];
+  });
+
+  //grade level list state
+  const [gradeLevels, setGradeLevels] = useState(() => {
+    const exisGrades: GradeLevel[] | null = getStorage("gradeLevels");
+    return exisGrades ? exisGrades : [];
+  });
+
+  //handle user state change sync with local storage
   useEffect(() => {
     if (!user) return;
-    setStorage("employees", employees);
-    setStorage("gradeLevels", gradeLevels);
+    setStorage("user", user);
   }, [user]);
 
-  //handle state change sync with local storage
+  //handle employee state change sync with local storage
   useEffect(() => {
-    const token = Cookies.get("sessionId");
-    if (!token) return;
     setStorage("employees", employees);
+  }, [employees]);
+
+  //handle grade levels state change sync with local storage
+  useEffect(() => {
+    setStorage("gradeLevels", gradeLevels);
   }, [employees]);
 
   const value = {
@@ -66,7 +80,7 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
 export const useAppContext = () => {
   const context = useContext(AppContext);
   if (context === undefined) {
-    throw new Error("useAppContext must be used within a MyContextProvider");
+    throw new Error("Context must be used within a Provider.");
   }
   return context;
 };
