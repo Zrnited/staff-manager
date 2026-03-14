@@ -1,14 +1,112 @@
+import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { HiOutlinePlus } from "react-icons/hi";
 import Button from "../../components/ui/Button";
 import SectionHeader from "../../components/ui/SectionHeader";
-import { LuUsers, LuUserRoundPlus } from "react-icons/lu";
-import { RiDeleteBinLine } from "react-icons/ri";
 import EmptySet from "../../components/ui/EmptySet";
 import CreateGradeLevel from "../../components/modals/grade-levels-page/CreateGradeLevel";
-import DeleteConfirmation from "../../components/modals/employees-page/DeleteConfirmation";
 import GradeLevelAssign from "../../components/modals/grade-levels-page/GradeLevelAssign";
+import GradeLevelCard from "../../components/ui/GradeLevelCard";
+import type {
+  GradeLevel,
+  GradeLevelForm,
+  GradeLevelsModals,
+} from "../../types";
+import { useAppContext } from "../../context";
+import { toast } from "sonner";
+import DeleteConfirmation from "../../components/modals/grade-levels-page/DeleteConfirmation";
 
 export default function GradeLevels() {
+  const { gradeLevels, setGradeLevels } = useAppContext();
+  const [modals, setModals] = useState<GradeLevelsModals>({
+    assignEmployee: false,
+    createGradeLevel: false,
+    deleteGradeLevel: false,
+  });
+  const [gradeLevelForm, setGradeLevelForm] = useState<GradeLevelForm>({
+    name: "",
+    description: "",
+  });
+  const [gradeLevel, setGradeLevel] = useState<GradeLevel>();
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target;
+    setGradeLevelForm((prevState) => {
+      return {
+        ...prevState,
+        [name]: value,
+      };
+    });
+  };
+
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    //assign id and date
+    const gradeId = uuidv4();
+    const whenCreated = new Date().toISOString();
+
+    const newGradeLevel: GradeLevel = {
+      id: gradeId,
+      name: gradeLevelForm.name,
+      description: gradeLevelForm.description,
+      createdAt: whenCreated,
+    };
+
+    //add
+    setGradeLevels((prevState) => {
+      return [...prevState, newGradeLevel];
+    });
+
+    //notify
+    toast.success("You've successfully created a new grade level.");
+
+    //close
+    setModals((prevState) => {
+      return {
+        ...prevState,
+        createGradeLevel: false,
+      };
+    });
+
+    //reset
+    setGradeLevelForm({
+      name: "",
+      description: "",
+    });
+  };
+
+  // const selectItemToDelete = (e: GradeLevel) => {
+  //   //setgradelevl
+  //   setGradeLevel(e);
+
+  //   //showmodal
+  //   setModals((prevState) => {
+  //     return {
+  //       ...prevState,
+  //       deleteGradeLevel: true,
+  //     };
+  //   });
+  // };
+
+  const deleteGradeLevel = () => {
+    if (!gradeLevel) return;
+    const filteredArr = gradeLevels.filter(
+      (grade) => grade.id !== gradeLevel.id,
+    );
+    setGradeLevels(filteredArr);
+    setModals((prevState) => {
+      return {
+        ...prevState,
+        deleteEmployee: false,
+      };
+    });
+    toast.success("Grade level deleted");
+    setGradeLevel(undefined);
+  };
+
   return (
     <section className="space-y-5 lg:space-y-7 lg:px-5 lg:py-4">
       {/* section heading */}
@@ -17,79 +115,54 @@ export default function GradeLevels() {
           heading="grade levels"
           subHeading="Mid-role assessment grade levels for employees."
         />
-        <Button btnText="create grade level" IconName={HiOutlinePlus} />
+        <Button
+          onClickFunction={() =>
+            setModals((prevState) => {
+              return {
+                ...prevState,
+                createGradeLevel: true,
+              };
+            })
+          }
+          btnText="create grade level"
+          IconName={HiOutlinePlus}
+        />
       </div>{" "}
-      {/* grade level cards */}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-        <div className="border border-[#E0E5EB] bg-white rounded-lg p-5 w-full flex justify-between text-[#8a7d8f] lg:p-6">
-          <div className="space-y-1">
-            <h1 className="font-grotesk text-black text-xl font-semibold">
-              LVL1
-            </h1>
-            <p>Entry Level</p>
-            <div className="flex items-center gap-x-2 mt-2">
-              <LuUsers />
-              <p>0 employees</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-x-2 text-lg">
-            <button className="bg-inherit hover:bg-[#2A9290]/20 hover:text-[#2A9290] cursor-pointer p-4 rounded-sm transition ease-in-out delay-100 w-fit">
-              <LuUserRoundPlus />
-            </button>
-            <button className="bg-inherit hover:bg-[#2A9290]/20 text-[#DC2828] cursor-pointer p-4 rounded-sm transition ease-in-out delay-100 w-fit">
-              <RiDeleteBinLine />
-            </button>
-          </div>
+      {/* body content */}
+      {gradeLevels.length === 0 ? (
+        // empty list notification
+        <EmptySet text="No grade levels yet. Create one to start categorizing employees." />
+      ) : (
+        // grade level list
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+          {gradeLevels.map((grade, index) => {
+            return (
+              <GradeLevelCard
+                key={index}
+                name={grade.name}
+                description={grade.description}
+              />
+            );
+          })}
         </div>
-        <div className="border border-[#E0E5EB] bg-white rounded-lg p-5 w-full flex justify-between text-[#8a7d8f] lg:p-6">
-          <div className="space-y-1">
-            <h1 className="font-grotesk text-black text-xl font-semibold">
-              LVL2
-            </h1>
-            <p>Senior Staff</p>
-            <div className="flex items-center gap-x-2 mt-2">
-              <LuUsers />
-              <p>0 employees</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-x-2 text-lg">
-            <button className="bg-inherit hover:bg-[#2A9290]/20 hover:text-[#2A9290] cursor-pointer p-4 rounded-sm transition ease-in-out delay-100 w-fit">
-              <LuUserRoundPlus />
-            </button>
-            <button className="bg-inherit hover:bg-[#2A9290]/20 text-[#DC2828] cursor-pointer p-4 rounded-sm transition ease-in-out delay-100 w-fit">
-              <RiDeleteBinLine />
-            </button>
-          </div>
-        </div>
-        <div className="border border-[#E0E5EB] bg-white rounded-lg p-5 w-full flex justify-between text-[#8a7d8f] lg:p-6">
-          <div className="space-y-1">
-            <h1 className="font-grotesk text-black text-xl font-semibold">
-              LVL3
-            </h1>
-            <p>Admin Block</p>
-            <div className="flex items-center gap-x-2 mt-2">
-              <LuUsers />
-              <p>0 employees</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-x-2 text-lg">
-            <button className="bg-inherit hover:bg-[#2A9290]/20 hover:text-[#2A9290] cursor-pointer p-4 rounded-sm transition ease-in-out delay-100 w-fit">
-              <LuUserRoundPlus />
-            </button>
-            <button className="bg-inherit hover:bg-[#2A9290]/20 text-[#DC2828] cursor-pointer p-4 rounded-sm transition ease-in-out delay-100 w-fit">
-              <RiDeleteBinLine />
-            </button>
-          </div>
-        </div>
-      </div>
-      {/* notifications */}
-      <EmptySet text="No grade levels yet. Create one to start categorizing employees." />
-      <CreateGradeLevel />
-      <DeleteConfirmation
-        title="Delete Grade Level"
-        desc={`"Delete "LVL1"? Employees in this grade will become unassigned.`}
-      />
-      <GradeLevelAssign />
+      )}
+      {modals.createGradeLevel && (
+        <CreateGradeLevel
+          handleSubmit={handleSubmit}
+          handleChange={handleChange}
+          setModals={setModals}
+          gradeLevelForm={gradeLevelForm}
+        />
+      )}
+      {modals.deleteGradeLevel && (
+        <DeleteConfirmation
+          title="Delete Grade Level"
+          desc={`"Delete "LVL1"? Employees in this grade will become unassigned.`}
+          setModals={setModals}
+          deleteGradeLevel={deleteGradeLevel}
+        />
+      )}
+      {modals.assignEmployee && <GradeLevelAssign />}
     </section>
   );
 }

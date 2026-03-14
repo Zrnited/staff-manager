@@ -52,3 +52,14 @@ export type EmployeePageModals = {
   viewEmployee: boolean;
   deleteEmployee: boolean;
 };
+
+export type GradeLevelsModals = {
+  assignEmployee: boolean;
+  createGradeLevel: boolean;
+  deleteGradeLevel: boolean;
+};
+
+export type GradeLevelForm = {
+  name: string;
+  description: string;
+};

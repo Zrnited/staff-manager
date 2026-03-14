@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-refresh/only-export-components */
 import {
   createContext,
@@ -63,7 +62,7 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
   //handle grade levels state change sync with local storage
   useEffect(() => {
     setStorage("gradeLevels", gradeLevels);
-  }, [employees]);
+  }, [gradeLevels]);
 
   const value = {
     employees,
