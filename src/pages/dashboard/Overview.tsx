@@ -49,7 +49,9 @@ export default function Overview() {
         </div>
       </div>
       {/* notification */}
-      <EmptySet text="No employees added yet. Head to the Employees page to add your first." />
+      {employees.length === 0 && (
+        <EmptySet text="No employees added yet. Head to the Employees page to add your first." />
+      )}
     </section>
   );
 }

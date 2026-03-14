@@ -1,4 +1,5 @@
-import { useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useAppContext } from "../../context";
 import type { Employee, EmployeeForm, EmployeePageModals } from "../../types";
@@ -12,6 +13,7 @@ import AddNewEmployee from "../../components/modals/employees-page/AddNewEmploye
 import EmployeeInfo from "../../components/modals/employees-page/EmployeeInfo";
 import DeleteConfirmation from "../../components/modals/employees-page/DeleteConfirmation";
 import { toast } from "sonner";
+import EmptySet from "../../components/ui/EmptySet";
 
 export default function Employees() {
   const [modals, setModals] = useState<EmployeePageModals>({
@@ -19,8 +21,7 @@ export default function Employees() {
     viewEmployee: false,
     deleteEmployee: false,
   });
-  const { setEmployees } = useAppContext();
-
+  const { employees, setEmployees } = useAppContext();
   const [employeeForm, setEmployeeForm] = useState<EmployeeForm>({
     name: "",
     role: "",
@@ -30,6 +31,19 @@ export default function Employees() {
     address: "",
     grade: "no grade assigned",
   });
+  const [employee, setEmployee] = useState<Employee>();
+
+  const resetEmployeeForm = () => {
+    setEmployeeForm({
+      name: "",
+      role: "",
+      department: "",
+      country: "",
+      state: "",
+      address: "",
+      grade: "no grade assigned",
+    });
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -45,6 +59,35 @@ export default function Employees() {
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    //update list
+    if (employee) {
+      const updatedEmployeesList = employees.map((staff) =>
+        staff.id === employee.id
+          ? {
+              ...employee,
+              name: employeeForm.name,
+              role: employeeForm.role,
+              department: employeeForm.department,
+              country: employeeForm.country,
+              state: employeeForm.state,
+              address: employeeForm.address,
+              grade: employeeForm.grade,
+            }
+          : staff,
+      );
+      setEmployees(updatedEmployeesList);
+      setEmployee(undefined);
+      resetEmployeeForm();
+      setModals((prevState) => {
+        return {
+          ...prevState,
+          addEmployee: false,
+        };
+      });
+      toast.success("Employee information updated successfully");
+      return;
+    }
 
     //assign id and date
     const userId = uuidv4();
@@ -69,7 +112,7 @@ export default function Employees() {
     });
 
     //notify
-    toast.success("Employee added to list");
+    toast.success("You've successfully added an employee.");
 
     //close modal and reset form
     setModals((prevState) => {
@@ -79,22 +122,46 @@ export default function Employees() {
       };
     });
 
-    setEmployeeForm({
-      name: "",
-      role: "",
-      department: "",
-      country: "",
-      state: "",
-      address: "",
-      grade: "no grade assigned",
-    });
+    resetEmployeeForm();
+
+    if (employee) setEmployee(undefined);
   };
+
+  const deleteEmployee = () => {
+    if (!employee) return;
+    const filteredArr = employees.filter((staff) => staff.id !== employee.id);
+    setEmployees(filteredArr);
+    setModals((prevState) => {
+      return {
+        ...prevState,
+        deleteEmployee: false,
+      };
+    });
+    toast.success("Employee removed from database");
+    setEmployee(undefined);
+  };
+
+  useEffect(() => {
+    if (!employee || !modals.addEmployee) return;
+    setEmployeeForm({
+      name: employee.name,
+      role: employee.role,
+      department: employee.department,
+      country: employee.country,
+      state: employee.state,
+      address: employee.address,
+      grade: employee.grade,
+    });
+  }, [employee]);
 
   return (
     <section className="space-y-5 lg:space-y-7 lg:px-5 lg:py-4">
       {/* section heading */}
       <div className="flex w-full flex-col gap-4 lg:flex-row lg:justify-between lg:items-center">
-        <SectionHeader heading="employees" subHeading="0 total employees" />
+        <SectionHeader
+          heading="employees"
+          subHeading={`${employees.length} Total Employees`}
+        />
         <Button
           onClickFunction={() =>
             setModals((prevState) => {
@@ -126,23 +193,50 @@ export default function Employees() {
         </div>
       </div>
       {/* list of employees */}
-      <section className="bg-white mt-10 relative">
-        <EmployeesTable />
+      <section
+        className={`mt-10 relative ${employees.length === 0 ? "inherit" : "bg-white"}`}
+      >
+        {employees.length === 0 ? (
+          <EmptySet
+            text={`No employees added yet. Click "Add Employee Button" to get started`}
+          />
+        ) : (
+          <EmployeesTable
+            setEmployee={setEmployee}
+            setModals={setModals}
+            employees={employees}
+          />
+        )}
       </section>
-      {/* add new employee modal */}
+      {/* add new employee / edit existing employee modal */}
       {modals.addEmployee && (
         <AddNewEmployee
+          setEmployee={setEmployee}
           employeeForm={employeeForm}
           setModals={setModals}
           handleChange={handleChange}
           handleSubmit={handleSubmit}
+          employee={employee}
+          resetEmployeeForm={resetEmployeeForm}
         />
       )}
-      <EmployeeInfo />
-      <DeleteConfirmation
-        title="Delete Employee"
-        desc="Are you sure you want to delete Kolawole Mayhorz? This action cannot be undone."
-      />
+      {/* view an existing employee */}
+      {modals.viewEmployee && (
+        <EmployeeInfo
+          viewEmployee={employee}
+          setViewEmployee={setEmployee}
+          setModals={setModals}
+        />
+      )}
+      {/* delete an existing employee */}
+      {modals.deleteEmployee && (
+        <DeleteConfirmation
+          title="Delete Employee"
+          desc={`Are you sure you want to delete ${employee?.name}? This action cannot be undone.`}
+          deleteEmployee={deleteEmployee}
+          setModals={setModals}
+        />
+      )}
     </section>
   );
 }

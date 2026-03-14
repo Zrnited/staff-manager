@@ -1,9 +1,18 @@
 import { FiEye, FiEdit2 } from "react-icons/fi";
 import { RiDeleteBinLine } from "react-icons/ri";
-import { useAppContext } from "../../context";
+import type { Employee, EmployeePageModals } from "../../types";
 
-export default function EmployeesTable() {
-  const { employees } = useAppContext();
+interface Props {
+  employees: Employee[];
+  setModals: React.Dispatch<React.SetStateAction<EmployeePageModals>>;
+  setEmployee: React.Dispatch<React.SetStateAction<Employee | undefined>>;
+}
+
+export default function EmployeesTable({
+  employees,
+  setModals,
+  setEmployee,
+}: Props) {
   const headings = [
     {
       name: "Name",
@@ -31,6 +40,37 @@ export default function EmployeesTable() {
     },
   ];
 
+  const handleClick = (action: "view" | "edit" | "delete", e: Employee) => {
+    if (action === "view") {
+      setEmployee(e);
+      setModals((prevState) => {
+        return {
+          ...prevState,
+          viewEmployee: true,
+        };
+      });
+      return;
+    }
+    if (action === "edit") {
+      setEmployee(e);
+      setModals((prevState) => {
+        return {
+          ...prevState,
+          addEmployee: true,
+        };
+      });
+      return;
+    }
+    //delete action
+    setEmployee(e);
+    setModals((prevState) => {
+      return {
+        ...prevState,
+        deleteEmployee: true,
+      };
+    });
+  };
+
   return (
     <table className="w-full border-collapse border-spacing-x-2 border-spacing-y-2 text-left align-middle border border-[#E6E6E6] lg:rounded-xl">
       <thead>
@@ -48,52 +88,53 @@ export default function EmployeesTable() {
           })}
         </tr>
       </thead>
-      {employees.length === 0 ? (
-        <div className="h-30 flex items-center justify-center text-center w-full align-middle text-[#8a7d8f] text-sm md:text-base">
-          <p className="absolute w-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mt-8">
-            No employees yet. Click 'Add Employee' to get started
-          </p>
-        </div>
-      ) : (
-        <tbody className="rounded-b-lg py-2">
-          {employees.map((staff, index) => {
-            return (
-              <tr
-                className="font-normal h-16 lg:h-20 border-b border-b-[#D9D9D9] text-[#232323] hover:bg-gray-50"
-                key={index}
-              >
-                <td className="pl-5 xl:pl-5 lg:pl-0 lowercase">
-                  <div className="flex items-center gap-x-2">
-                    <div className="bg-[#E8F4E9] w-9.5 h-9.5 flex items-center justify-center text-[#166B1D] rounded-full font-bold uppercase text-sm">
-                      K
-                    </div>
-                    <h3 className="capitalize text-[#0F172A]">{staff.name}</h3>
+      <tbody className="rounded-b-lg py-2">
+        {employees.map((staff, index) => {
+          return (
+            <tr
+              className="font-normal h-16 lg:h-20 border-b border-b-[#D9D9D9] text-[#232323] hover:bg-gray-50"
+              key={index}
+            >
+              <td className="pl-5 xl:pl-5 lg:pl-0 lowercase">
+                <div className="flex items-center gap-x-2">
+                  <div className="bg-[#E8F4E9] w-9.5 h-9.5 flex items-center justify-center text-[#166B1D] rounded-full font-bold uppercase text-sm">
+                    {staff.name.slice(0, 1).toUpperCase()}
                   </div>
-                </td>
-                <td className="hidden lg:table-cell">{staff.role}</td>
-                <td className="hidden lg:table-cell">{staff.department}</td>
-                <td className="hidden lg:table-cell">{staff.state}</td>
-                <td className="hidden capitalize sm:table-cell">
-                  {staff.grade}
-                </td>
-                <td className="w-auto">
-                  <div className="flex w-fit items-center gap-2">
-                    <button className="bg-inherit hover:bg-[#2A9290]/20 hover:text-[#2A9290] cursor-pointer p-2 rounded-sm transition ease-in-out delay-100 w-fit lg:p-3">
-                      <FiEye />
-                    </button>
-                    <button className="bg-inherit hover:bg-[#2A9290]/20 hover:text-[#2A9290] cursor-pointer p-2 rounded-sm transition ease-in-out delay-100 w-fit lg:p-3">
-                      <FiEdit2 />
-                    </button>
-                    <button className="bg-inherit hover:bg-[#2A9290]/20 text-[#DC2828] cursor-pointer p-2 rounded-sm transition ease-in-out delay-100 w-fit lg:p-3">
-                      <RiDeleteBinLine />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      )}
+                  <h3 className="capitalize text-[#0F172A]">{staff.name}</h3>
+                </div>
+              </td>
+              <td className="hidden lg:table-cell">{staff.role}</td>
+              <td className="hidden lg:table-cell">{staff.department}</td>
+              <td className="hidden lg:table-cell">{staff.state}</td>
+              <td className="hidden capitalize sm:table-cell">
+                {staff.grade === "no grade assigned" ? "-" : staff.grade}
+              </td>
+              <td className="w-auto">
+                <div className="flex w-fit items-center gap-2">
+                  <button
+                    onClick={() => handleClick("view", staff)}
+                    className="bg-inherit hover:bg-[#2A9290]/20 hover:text-[#2A9290] cursor-pointer p-2 rounded-sm transition ease-in-out delay-100 w-fit lg:p-3"
+                  >
+                    <FiEye />
+                  </button>
+                  <button
+                    onClick={() => handleClick("edit", staff)}
+                    className="bg-inherit hover:bg-[#2A9290]/20 hover:text-[#2A9290] cursor-pointer p-2 rounded-sm transition ease-in-out delay-100 w-fit lg:p-3"
+                  >
+                    <FiEdit2 />
+                  </button>
+                  <button
+                    onClick={() => handleClick("delete", staff)}
+                    className="bg-inherit hover:bg-[#2A9290]/20 text-[#DC2828] cursor-pointer p-2 rounded-sm transition ease-in-out delay-100 w-fit lg:p-3"
+                  >
+                    <RiDeleteBinLine />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
     </table>
   );
 }

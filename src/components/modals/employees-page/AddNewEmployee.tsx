@@ -1,7 +1,11 @@
 import { AiOutlineClose } from "react-icons/ai";
 import Input from "../../ui/Input";
 import { BsChevronDown } from "react-icons/bs";
-import type { EmployeeForm, EmployeePageModals } from "../../../types";
+import type {
+  Employee,
+  EmployeeForm,
+  EmployeePageModals,
+} from "../../../types";
 
 interface Props {
   setModals: React.Dispatch<React.SetStateAction<EmployeePageModals>>;
@@ -10,6 +14,9 @@ interface Props {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement, Element>,
   ) => void;
   handleSubmit: (e: React.SubmitEvent<HTMLFormElement>) => void;
+  employee: Employee | undefined;
+  setEmployee: React.Dispatch<React.SetStateAction<Employee | undefined>>;
+  resetEmployeeForm: () => void;
 }
 
 export default function AddNewEmployee({
@@ -17,6 +24,9 @@ export default function AddNewEmployee({
   setModals,
   handleChange,
   handleSubmit,
+  setEmployee,
+  employee,
+  resetEmployeeForm,
 }: Props) {
   const closeModal = () => {
     setModals((prevState) => {
@@ -25,6 +35,10 @@ export default function AddNewEmployee({
         addEmployee: false,
       };
     });
+    if (employee) {
+      setEmployee(undefined);
+      resetEmployeeForm();
+    }
   };
 
   return (
