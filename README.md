@@ -94,5 +94,4 @@ Potential improvements for the project includes:
 
 # Author
 
-Kolawole Mayowa
-Frontend Developer
+Kolawole Mayowa (Frontend Developer)
