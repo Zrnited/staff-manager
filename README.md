@@ -33,51 +33,41 @@ npm -v
 
 # Installation
 
-1. Clone the Repository:
-
-https://github.com/Zrnited/staff-manager.git
+1. Clone the Repository: https://github.com/Zrnited/staff-manager.git
 
 2. Navigate into the project folder
 
+```bash
 cd staff-manager
+```
 
 3. Install dependencies
 
+```bash
 npm install
+```
 
 4. Run the Project Locally
 
+```bash
 npm run start:dev
+```
 
-5. After running the command, open your browser and navigate to:
-
-http://localhost:7070
+5. After running the command, open your browser and navigate to: http://localhost:7070
 
 # Manner of Approach
 
-1. Requirement Analysis
+1. Requirement Analysis: The project requirements were first reviewed to understand the expected functionality and user interactions.
 
-The project requirements were first reviewed to understand the expected functionality and user interactions.
+2. Project setup: The application was initialized using Vite to provide a fast development environment for the React application.
 
-2. Project setup
+3. Component-based Architecture: The UI was broken down into reusable components to ensure modularity and maintainability.
 
-The application was initialized using Vite to provide a fast development environment for the React application.
+4. State Management: State was handled using React Use Context API to manage data flow between components efficiently.
 
-3. Component-based Architecture
+5. Styling: Styling was implemented using Tailwind CSS to create a responsive and user-friendly interface.
 
-The UI was broken down into reusable components to ensure modularity and maintainability.
-
-4. State Management
-
-State was handled using React Use Context API to manage data flow between components efficiently.
-
-5. Styling
-
-Styling was implemented using Tailwind CSS to create a responsive and user-friendly interface.
-
-6. Optimization
-
-Code structure and performance considerations were applied to ensure the application runs efficiently and remains scalable.
+6. Optimization: Code structure and performance considerations were applied to ensure the application runs efficiently and remains scalable.
 
 # Future Improvements
 
