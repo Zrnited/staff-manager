@@ -69,6 +69,15 @@ admin@email.com
 123456
 ```
 
+# Environmental Variables
+
+Please include a ".env.local" file in the root folder of your project and add these credentials:
+
+```bash
+VITE_API_URL=https://pkgstore.datahub.io/core/world-cities/world-cities_json/data/5b3dd46ad10990bca47b04b4739a02ba/world-cities_json.json
+VITE_APP_NAME=Staff_Manager
+```
+
 # Manner of Approach
 
 1. Requirement Analysis: The project requirements were first reviewed to understand the expected functionality and user interactions.
