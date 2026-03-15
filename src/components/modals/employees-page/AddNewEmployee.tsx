@@ -170,7 +170,7 @@ export default function AddNewEmployee({
                 }
                 className="w-full capitalize h-full rounded-xl bg-[#2A9290] hover:bg-[#242d3b] text-white focus:outline-none cursor-pointer transition ease-in-out delay-100 disabled:bg-gray-300 disabled:cursor-not-allowed md:w-[60%]"
               >
-                add employee
+                {employee ? "update employee" : "add employee"}
               </button>
             </div>
           </form>
