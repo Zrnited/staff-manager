@@ -55,6 +55,20 @@ npm run start:dev
 
 5. After running the command, open your browser and navigate to: http://localhost:7070
 
+# Test login Credentials
+
+- Email
+
+```bash
+admin@email.com
+```
+
+- Password
+
+```bash
+123456
+```
+
 # Manner of Approach
 
 1. Requirement Analysis: The project requirements were first reviewed to understand the expected functionality and user interactions.
