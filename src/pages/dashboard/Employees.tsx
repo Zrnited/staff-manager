@@ -41,7 +41,6 @@ export default function Employees() {
   });
   const [employee, setEmployee] = useState<Employee>();
   const [data, setData] = useState<Employee[]>([]);
-  console.log(data);
   const [countries, setCountries] = useState<string[]>([]);
   const [search, setSearch] = useState<SearchFunctionality>({
     keyword: "",

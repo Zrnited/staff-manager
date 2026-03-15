@@ -1,73 +1,94 @@
-# React + TypeScript + Vite
+# Staff Manager
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a React Staff Directory web application built with Vite that allows a manager to manage employees in an organization.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# Tech Stack
 
-## React Compiler
+- React
+- Vite
+- TypeScript
+- Tailwind CSS
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+# Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Follow the instructions below to run the project locally on your machine.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Prerequisites
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Make sure you have the following installed:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Node.js (version 18 or higher recommended)
+- npm or yarn
+
+You can check your versions with:
+
+```bash
+node -v
+npm -v
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+# Installation
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. Clone the Repository:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+https://github.com/Zrnited/staff-manager.git
+
+2. Navigate into the project folder
+
+cd staff-manager
+
+3. Install dependencies
+
+npm install
+
+4. Run the Project Locally
+
+npm run start:dev
+
+5. After running the command, open your browser and navigate to:
+
+http://localhost:7070
+
+# Manner of Approach
+
+1. Requirement Analysis
+
+The project requirements were first reviewed to understand the expected functionality and user interactions.
+
+2. Project setup
+
+The application was initialized using Vite to provide a fast development environment for the React application.
+
+3. Component-based Architecture
+
+The UI was broken down into reusable components to ensure modularity and maintainability.
+
+4. State Management
+
+State was handled using React Use Context API to manage data flow between components efficiently.
+
+5. Styling
+
+Styling was implemented using Tailwind CSS to create a responsive and user-friendly interface.
+
+6. Optimization
+
+Code structure and performance considerations were applied to ensure the application runs efficiently and remains scalable.
+
+# Future Improvements
+
+Potential improvements for the project includes:
+
+1. Adding better error handling
+2. Inproving UI/UX interactions
+3. Implementing additional features
+4. Adding automated tests
+
+# Author
+
+Kolawole Mayowa
+Frontend Developer
