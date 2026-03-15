@@ -7,6 +7,11 @@ import { useAppContext } from "../../context";
 
 export default function Overview() {
   const { employees, gradeLevels } = useAppContext();
+  const getDeptCount = (): number => {
+    const departments = employees.map((staff) => staff.department);
+    const filterArr = [...new Set(departments)];
+    return filterArr ? filterArr.length : 0;
+  };
   return (
     <section className="space-y-5 lg:space-y-7 lg:px-5 lg:py-4">
       <SectionHeader
@@ -36,14 +41,17 @@ export default function Overview() {
           <OverviewCard
             cardTitle="departments"
             cardColor="#2A9290"
-            count={1}
+            count={getDeptCount()}
             IconName={LuBuilding}
           />
           {/* grade levels */}
           <OverviewCard
             cardTitle="graded employees"
             cardColor="#2A9290"
-            count={0}
+            count={
+              employees.filter((staff) => staff.grade !== "no grade assigned")
+                .length
+            }
             IconName={FiUserCheck}
           />
         </div>

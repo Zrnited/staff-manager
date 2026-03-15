@@ -80,32 +80,33 @@ export default function GradeLevels() {
     });
   };
 
-  // const selectItemToDelete = (e: GradeLevel) => {
-  //   //setgradelevl
-  //   setGradeLevel(e);
-
-  //   //showmodal
-  //   setModals((prevState) => {
-  //     return {
-  //       ...prevState,
-  //       deleteGradeLevel: true,
-  //     };
-  //   });
-  // };
-
   const deleteGradeLevel = () => {
     if (!gradeLevel) return;
+    //remove the grade level
     const filteredArr = gradeLevels.filter(
       (grade) => grade.id !== gradeLevel.id,
     );
     setGradeLevels(filteredArr);
+    //reset the affected employee grades
+    const updatedEmployeesList = employees.map((staff) =>
+      staff.grade === gradeLevel.name
+        ? {
+            ...staff,
+            grade: "no grade assigned",
+          }
+        : staff,
+    );
+    setEmployees(updatedEmployeesList);
+    //close modal
     setModals((prevState) => {
       return {
         ...prevState,
         deleteGradeLevel: false,
       };
     });
+    //notify
     toast.success("Grade level deleted");
+    //reset grade level
     setGradeLevel(undefined);
   };
 

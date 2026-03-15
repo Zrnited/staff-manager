@@ -70,3 +70,8 @@ export type Country = {
   name: string;
   subcountry: string;
 };
+
+export type SearchFunctionality = {
+  keyword: string;
+  grade: string;
+};

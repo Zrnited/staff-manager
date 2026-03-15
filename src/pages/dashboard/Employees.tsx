@@ -8,6 +8,7 @@ import type {
   Employee,
   EmployeeForm,
   EmployeePageModals,
+  SearchFunctionality,
 } from "../../types";
 import Button from "../../components/ui/Button";
 import SectionHeader from "../../components/ui/SectionHeader";
@@ -28,7 +29,7 @@ export default function Employees() {
     viewEmployee: false,
     deleteEmployee: false,
   });
-  const { employees, setEmployees } = useAppContext();
+  const { employees, setEmployees, gradeLevels } = useAppContext();
   const [employeeForm, setEmployeeForm] = useState<EmployeeForm>({
     name: "",
     role: "",
@@ -39,7 +40,13 @@ export default function Employees() {
     grade: "no grade assigned",
   });
   const [employee, setEmployee] = useState<Employee>();
+  const [data, setData] = useState<Employee[]>([]);
+  console.log(data);
   const [countries, setCountries] = useState<string[]>([]);
+  const [search, setSearch] = useState<SearchFunctionality>({
+    keyword: "",
+    grade: "all",
+  });
 
   const fetchCountries = async () => {
     await getAllCountries()
@@ -178,6 +185,43 @@ export default function Employees() {
   }, [employee]);
 
   useEffect(() => {
+    setData(employees);
+    setSearch({
+      keyword: "",
+      grade: "all",
+    });
+  }, [employees]);
+
+  useEffect(() => {
+    //filter by default
+    if (search.keyword === "" && search.grade === "all") {
+      setData(employees);
+      return;
+    }
+    //filter by keyword alone
+    if (search.keyword.toLowerCase() !== "" && search.grade === "all") {
+      const results = employees.filter((staff) =>
+        staff.name.toLowerCase().includes(search.keyword.toLowerCase()),
+      );
+      setData(results);
+      return;
+    }
+    //filter by keyword and grade
+    if (search.keyword.toLowerCase() !== "" && search.grade !== "all") {
+      const results = employees.filter(
+        (staff) =>
+          staff.name.toLowerCase().includes(search.keyword.toLowerCase()) &&
+          staff.grade === search.grade,
+      );
+      setData(results);
+      return;
+    }
+    //grade alone
+    const results = employees.filter((staff) => staff.grade === search.grade);
+    setData(results);
+  }, [search]);
+
+  useEffect(() => {
     fetchCountries();
   }, []);
 
@@ -206,24 +250,48 @@ export default function Employees() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center xl:max-w-175">
         <div className="relative md:w-full xl:w-[60%]">
           <input
+            onChange={(e) => {
+              setSearch((prevState) => {
+                return {
+                  ...prevState,
+                  keyword: e.target.value,
+                };
+              });
+            }}
             className="border border-[#E0E5EB] w-full h-12.5 rounded-md pl-10 pr-3 focus:outline-[#2A9290] xl:pl-12"
             placeholder="Search by name..."
           />
           <CiSearch className="absolute left-3 top-3 text-2xl text-gray-500 xl:left-4" />
         </div>
         <div className="relative md:w-full xl:w-[40%]">
-          <select className="border border-[#E0E5EB] w-full h-12.5 rounded-md cursor-pointer px-5 appearance-none focus:outline-[#2A9290]">
+          <select
+            onChange={(e) => {
+              setSearch((prevState) => {
+                return {
+                  ...prevState,
+                  grade: e.target.value,
+                };
+              });
+            }}
+            className="border border-[#E0E5EB] w-full h-12.5 rounded-md cursor-pointer px-5 appearance-none focus:outline-[#2A9290]"
+          >
             <option value={"all"}>All Grades</option>
-            <option value="none">Unassigned</option>
+            {gradeLevels.map((grade, index) => {
+              return (
+                <option key={index} value={grade.name}>
+                  {grade.name}
+                </option>
+              );
+            })}
           </select>
           <BsChevronDown className="absolute right-4 top-4 text-xl text-gray-500" />
         </div>
       </div>
       {/* list of employees */}
       <section
-        className={`mt-10 relative ${employees.length === 0 ? "inherit" : "bg-white"}`}
+        className={`mt-10 relative ${data.length === 0 ? "inherit" : "bg-white"}`}
       >
-        {employees.length === 0 ? (
+        {data.length === 0 ? (
           <EmptySet
             text={`No employees added yet. Click "Add Employee Button" to get started`}
           />
@@ -231,7 +299,7 @@ export default function Employees() {
           <EmployeesTable
             setEmployee={setEmployee}
             setModals={setModals}
-            employees={employees}
+            employees={data}
           />
         )}
       </section>

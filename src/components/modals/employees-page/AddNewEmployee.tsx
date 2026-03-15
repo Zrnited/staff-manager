@@ -1,6 +1,7 @@
 import { AiOutlineClose } from "react-icons/ai";
 import Input from "../../ui/Input";
 import { BsChevronDown } from "react-icons/bs";
+import { useAppContext } from "../../../context";
 import type {
   Employee,
   EmployeeForm,
@@ -42,7 +43,7 @@ export default function AddNewEmployee({
       resetEmployeeForm();
     }
   };
-
+  const { gradeLevels } = useAppContext();
   return (
     <div className="w-full h-screen fixed top-0 bottom-0 left-0 right-0 z-20">
       <div className="w-full h-full flex flex-col gap-y-1 justify-center items-center right-0 bg-[#000000]/70 backdrop-blur-md">
@@ -139,7 +140,13 @@ export default function AddNewEmployee({
                   className="h-12.5 rounded-xl border w-full border-[#E2E8F0] px-3 appearance-none cursor-pointer focus:outline-[#2A9290]"
                 >
                   <option value={"no grade assigned"}>Assign later</option>
-                  <option value={"LVL1"}>LVL1</option>
+                  {gradeLevels.map((level, index) => {
+                    return (
+                      <option key={index} value={level.name}>
+                        {level.name}
+                      </option>
+                    );
+                  })}
                 </select>
                 <BsChevronDown className="absolute right-4 top-4 text-xl text-gray-500" />
               </div>

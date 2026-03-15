@@ -3,6 +3,7 @@ import { useAppContext } from "../../context";
 import { AiOutlineLogout } from "react-icons/ai";
 import { navLinks } from "../../constants";
 import { deleteCookie, removeStorage } from "../../utils";
+import { avatar } from "../../constants/images";
 
 interface Props {
   sidenav: boolean;
@@ -68,15 +69,15 @@ export default function Sidebar({ sidenav, setSidenav }: Props) {
           <p className="capitalize">Logout</p>
         </button>
         <div className="flex items-center gap-x-2 text-white">
-          <div className="w-12 h-12 rounded-full border-2 border-[#E2E8F0]">
-            {/* <img
+          <div className="w-12 h-12 rounded-full border-2 border-[#E2E8F0] overflow-hidden">
+            <img
               className="w-full h-full"
-              alt="img"
+              alt="avatar"
               decoding="async"
               draggable={false}
               loading="lazy"
-              src={demoImg}
-            /> */}
+              src={avatar}
+            />
           </div>
           <div>
             <h2 className="lg:text-base capitalize">Head Supervisor</h2>
