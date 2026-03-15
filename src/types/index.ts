@@ -63,3 +63,10 @@ export type GradeLevelForm = {
   name: string;
   description: string;
 };
+
+export type Country = {
+  country: string;
+  geonameid: number;
+  name: string;
+  subcountry: string;
+};

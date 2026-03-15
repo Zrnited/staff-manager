@@ -1,10 +1,11 @@
-import type { GradeLevelsModals } from "../../../types";
+import type { GradeLevel, GradeLevelsModals } from "../../../types";
 
 interface Props {
   title: string;
   desc: string;
   deleteGradeLevel: () => void;
   setModals: React.Dispatch<React.SetStateAction<GradeLevelsModals>>;
+  setGradeLevel: React.Dispatch<React.SetStateAction<GradeLevel | undefined>>;
 }
 
 export default function DeleteConfirmation({
@@ -12,6 +13,7 @@ export default function DeleteConfirmation({
   desc,
   deleteGradeLevel,
   setModals,
+  setGradeLevel,
 }: Props) {
   return (
     <div className="w-full h-screen fixed top-0 bottom-0 left-0 right-0 z-20">
@@ -30,6 +32,7 @@ export default function DeleteConfirmation({
                     deleteGradeLevel: false,
                   };
                 });
+                setGradeLevel(undefined);
               }}
               className="h-full w-full px-5 flex items-center justify-center border rounded-xl border-gray-200 capitalize hover:bg-[#2A9290]/10 transition ease-in-out delay-100 cursor-pointer font-medium md:w-1/2"
             >

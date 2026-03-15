@@ -1,8 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useAppContext } from "../../context";
-import type { Employee, EmployeeForm, EmployeePageModals } from "../../types";
+import type {
+  Country,
+  Employee,
+  EmployeeForm,
+  EmployeePageModals,
+} from "../../types";
 import Button from "../../components/ui/Button";
 import SectionHeader from "../../components/ui/SectionHeader";
 import { CiSearch } from "react-icons/ci";
@@ -14,6 +20,7 @@ import EmployeeInfo from "../../components/modals/employees-page/EmployeeInfo";
 import DeleteConfirmation from "../../components/modals/employees-page/DeleteConfirmation";
 import { toast } from "sonner";
 import EmptySet from "../../components/ui/EmptySet";
+import { getAllCountries } from "../../api/getCountries";
 
 export default function Employees() {
   const [modals, setModals] = useState<EmployeePageModals>({
@@ -32,6 +39,22 @@ export default function Employees() {
     grade: "no grade assigned",
   });
   const [employee, setEmployee] = useState<Employee>();
+  const [countries, setCountries] = useState<string[]>([]);
+
+  const fetchCountries = async () => {
+    await getAllCountries()
+      .then((res) => {
+        if (res) setCountries(res);
+        const countryNames: Array<string> = res.map(
+          (country: Country) => country.country,
+        );
+        const filterArr = [...new Set(countryNames)];
+        if (filterArr) setCountries(filterArr);
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
+  };
 
   const resetEmployeeForm = () => {
     setEmployeeForm({
@@ -154,6 +177,10 @@ export default function Employees() {
     });
   }, [employee]);
 
+  useEffect(() => {
+    fetchCountries();
+  }, []);
+
   return (
     <section className="space-y-5 lg:space-y-7 lg:px-5 lg:py-4">
       {/* section heading */}
@@ -211,6 +238,7 @@ export default function Employees() {
       {/* add new employee / edit existing employee modal */}
       {modals.addEmployee && (
         <AddNewEmployee
+          countries={countries}
           setEmployee={setEmployee}
           employeeForm={employeeForm}
           setModals={setModals}

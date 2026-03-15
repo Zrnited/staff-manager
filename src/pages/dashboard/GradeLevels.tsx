@@ -17,7 +17,8 @@ import { toast } from "sonner";
 import DeleteConfirmation from "../../components/modals/grade-levels-page/DeleteConfirmation";
 
 export default function GradeLevels() {
-  const { gradeLevels, setGradeLevels } = useAppContext();
+  const { gradeLevels, setGradeLevels, employees, setEmployees } =
+    useAppContext();
   const [modals, setModals] = useState<GradeLevelsModals>({
     assignEmployee: false,
     createGradeLevel: false,
@@ -28,6 +29,7 @@ export default function GradeLevels() {
     description: "",
   });
   const [gradeLevel, setGradeLevel] = useState<GradeLevel>();
+  const [selEmployeeId, setSelEmployeeId] = useState<string>();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -100,11 +102,35 @@ export default function GradeLevels() {
     setModals((prevState) => {
       return {
         ...prevState,
-        deleteEmployee: false,
+        deleteGradeLevel: false,
       };
     });
     toast.success("Grade level deleted");
     setGradeLevel(undefined);
+  };
+
+  const assignGradeLevel = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!selEmployeeId || selEmployeeId === "") return;
+    if (!gradeLevel) return;
+    const updatedEmployeesList = employees.map((staff) =>
+      staff.id === selEmployeeId
+        ? {
+            ...staff,
+            grade: gradeLevel.name,
+          }
+        : staff,
+    );
+    setEmployees(updatedEmployeesList);
+    toast.success("Employee assigned to grade level");
+    setModals((prevState) => {
+      return {
+        ...prevState,
+        assignEmployee: false,
+      };
+    });
+    setGradeLevel(undefined);
+    setSelEmployeeId(undefined);
   };
 
   return (
@@ -141,6 +167,24 @@ export default function GradeLevels() {
                 key={index}
                 name={grade.name}
                 description={grade.description}
+                handleDeleteBtnClick={() => {
+                  setGradeLevel(grade);
+                  setModals((prevState) => {
+                    return {
+                      ...prevState,
+                      deleteGradeLevel: true,
+                    };
+                  });
+                }}
+                handleAssignEmployeeBtnClick={() => {
+                  setGradeLevel(grade);
+                  setModals((prevState) => {
+                    return {
+                      ...prevState,
+                      assignEmployee: true,
+                    };
+                  });
+                }}
               />
             );
           })}
@@ -157,12 +201,21 @@ export default function GradeLevels() {
       {modals.deleteGradeLevel && (
         <DeleteConfirmation
           title="Delete Grade Level"
-          desc={`"Delete "LVL1"? Employees in this grade will become unassigned.`}
+          desc={`Delete ${gradeLevel?.name}? Employees in this grade will become unassigned.`}
           setModals={setModals}
           deleteGradeLevel={deleteGradeLevel}
+          setGradeLevel={setGradeLevel}
         />
       )}
-      {modals.assignEmployee && <GradeLevelAssign />}
+      {modals.assignEmployee && (
+        <GradeLevelAssign
+          setModals={setModals}
+          setGradeLevel={setGradeLevel}
+          gradeLevel={gradeLevel}
+          setSelEmployeeId={setSelEmployeeId}
+          assignGradeLevel={assignGradeLevel}
+        />
+      )}
     </section>
   );
 }

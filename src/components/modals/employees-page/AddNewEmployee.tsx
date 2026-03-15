@@ -17,6 +17,7 @@ interface Props {
   employee: Employee | undefined;
   setEmployee: React.Dispatch<React.SetStateAction<Employee | undefined>>;
   resetEmployeeForm: () => void;
+  countries: string[];
 }
 
 export default function AddNewEmployee({
@@ -27,6 +28,7 @@ export default function AddNewEmployee({
   setEmployee,
   employee,
   resetEmployeeForm,
+  countries,
 }: Props) {
   const closeModal = () => {
     setModals((prevState) => {
@@ -85,14 +87,24 @@ export default function AddNewEmployee({
                 type="text"
                 name="department"
               />
-              <Input
-                value={employeeForm.country}
-                handleChange={handleChange}
-                required={true}
-                label="country"
-                type="text"
-                name="country"
-              />
+              <div className="flex flex-col gap-y-1.5">
+                <label className="font-medium capitalize">country</label>
+                <div className="relative">
+                  <select
+                    name="country"
+                    value={employeeForm.country}
+                    onChange={handleChange}
+                    required
+                    className="h-12.5 rounded-xl border w-full border-[#E2E8F0] px-3 appearance-none cursor-pointer focus:outline-[#2A9290]"
+                  >
+                    <option value={""}>-- Select --</option>
+                    {countries.map((country, index) => {
+                      return <option key={index}>{country}</option>;
+                    })}
+                  </select>
+                  <BsChevronDown className="absolute right-4 top-4 text-xl text-gray-500" />
+                </div>
+              </div>
             </div>
             {/* state / province & address */}
             <div className="flex w-full flex-col gap-3 md:flex-row md:items-center">
