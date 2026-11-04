@@ -22,6 +22,7 @@ import DeleteConfirmation from "../../components/modals/employees-page/DeleteCon
 import { toast } from "sonner";
 import EmptySet from "../../components/ui/EmptySet";
 import { getAllCountries } from "../../api/getCountries";
+// import { createEmployee } from "../../api/employees/createEmployee";
 
 export default function Employees() {
   const [modals, setModals] = useState<EmployeePageModals>({
@@ -61,6 +62,10 @@ export default function Employees() {
         console.log(error);
       });
   };
+
+  // const AddEmployee = async () => {
+  //   await createEmployee()
+  // }
 
   const resetEmployeeForm = () => {
     setEmployeeForm({
