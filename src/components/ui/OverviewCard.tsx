@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 interface Props {
   cardTitle: string;
-  count: number;
+  count: number | string;
   IconName: IconType;
   cardColor: string;
   path?: string;

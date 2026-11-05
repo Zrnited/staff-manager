@@ -3,6 +3,7 @@ export * from "./deleteEmployee";
 export * from "./getEmployee";
 export * from "./getEmployees";
 export * from "./updateEmployee";
+export * from "./getStats";
 
 export const BASE = "/employees";
 

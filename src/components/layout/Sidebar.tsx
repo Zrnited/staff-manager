@@ -2,8 +2,11 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppContext } from "../../context";
 import { AiOutlineLogout } from "react-icons/ai";
 import { navLinks } from "../../constants";
-import { deleteCookie, removeStorage } from "../../utils";
 import { avatar } from "../../constants/images";
+import { useState } from "react";
+import { signout } from "../../api/auth";
+import type { ApiError } from "../../lib/api";
+import { toast } from "sonner";
 
 interface Props {
   sidenav: boolean;
@@ -12,17 +15,25 @@ interface Props {
 
 export default function Sidebar({ sidenav, setSidenav }: Props) {
   const { pathname } = useLocation();
+  const { user } = useAppContext();
   const { setEmployees, setGradeLevels, setUser } = useAppContext();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const logOut = () => {
-    deleteCookie("sessionId");
-    removeStorage("gradeLevels");
-    removeStorage("employees");
-    setEmployees([]);
-    setGradeLevels([]);
-    setUser(undefined);
-    navigate("/", { replace: true });
+  const logout = async () => {
+    setIsLoading(true);
+    await signout()
+      .then(() => {
+        setEmployees(null);
+        setGradeLevels(null);
+        setUser(null);
+        navigate("/", { replace: true });
+      })
+      .catch((e) => {
+        const err = e as ApiError;
+        toast.error(err.message);
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -62,11 +73,13 @@ export default function Sidebar({ sidenav, setSidenav }: Props) {
       <section className="space-y-3 mt-5">
         <hr className="h-px border-none bg-[#2A313c] w-full mt-6" />
         <button
-          onClick={logOut}
+          onClick={logout}
           className="flex items-center gap-x-3 transition ease-in-out text-white delay-100 w-full p-3 rounded-xl font-semibold cursor-pointer hover:bg-[#FF383C] hover:text-white text-lg lg:text-base"
         >
           <AiOutlineLogout />
-          <p className="capitalize">Logout</p>
+          <p className="capitalize">
+            {isLoading ? "Logging out..." : "Logout"}
+          </p>
         </button>
         <div className="flex items-center gap-x-2 text-white">
           <div className="w-12 h-12 rounded-full border-2 border-[#E2E8F0] overflow-hidden">
@@ -80,8 +93,10 @@ export default function Sidebar({ sidenav, setSidenav }: Props) {
             />
           </div>
           <div>
-            <h2 className="lg:text-base capitalize">Head Supervisor</h2>
-            <p className="text-sm lg:text-sm">admin@email.com</p>
+            <h2 className="lg:text-base capitalize">
+              {user ? `${user?.lastName} ${user?.firstName}` : "N/A"}
+            </h2>
+            <p className="text-sm lg:text-sm">{user?.email ?? "N/A"}</p>
           </div>
         </div>
       </section>

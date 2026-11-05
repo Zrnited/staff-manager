@@ -23,13 +23,13 @@ api.interceptors.response.use(
     const url = error.config?.url ?? "";
 
     const isAuthCheck =
-      url.includes("/auth/signin") || url.includes("/auth/me");
+      url.includes("/users/signin") || url.includes("/users/whoami");
     if (
       status === 401 &&
       !isAuthCheck &&
-      window.location.pathname !== "/signin"
+      window.location.pathname !== "/"
     ) {
-      window.location.href = "/signin";
+      window.location.href = "/";
     }
 
     const normalized: ApiError = {

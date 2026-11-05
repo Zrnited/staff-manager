@@ -3,15 +3,26 @@ import OverviewCard from "../../components/ui/OverviewCard";
 import { FiUserCheck } from "react-icons/fi";
 import EmptySet from "../../components/ui/EmptySet";
 import SectionHeader from "../../components/ui/SectionHeader";
-import { useAppContext } from "../../context";
+import { getStats } from "../../api/employees";
+import { useEffect, useState } from "react";
+import type { Stats } from "../../types";
 
 export default function Overview() {
-  const { employees, gradeLevels } = useAppContext();
-  const getDeptCount = (): number => {
-    const departments = employees.map((staff) => staff.department);
-    const filterArr = [...new Set(departments)];
-    return filterArr ? filterArr.length : 0;
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [isFetchingStats, setIsFetchingStats] = useState<boolean>(true);
+  const [getStatsErr, setGetStatsErr] = useState<boolean>(false);
+
+  const fetchStats = async () => {
+    await getStats()
+      .then((res) => (setStats(res.data), console.log("Stats: ", res)))
+      .catch(() => setGetStatsErr(true))
+      .finally(() => setIsFetchingStats(false));
   };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
   return (
     <section className="space-y-5 lg:space-y-7 lg:px-5 lg:py-4">
       <SectionHeader
@@ -25,7 +36,7 @@ export default function Overview() {
           <OverviewCard
             cardTitle="total employees"
             cardColor="#2A9290"
-            count={employees.length}
+            count={stats?.numOfEmployees ?? "-"}
             IconName={LuUsers}
             path="/d/employees"
           />
@@ -33,7 +44,7 @@ export default function Overview() {
           <OverviewCard
             cardTitle="grade levels"
             cardColor="#F1BE0E"
-            count={gradeLevels.length}
+            count={stats?.numOfGradeLevels ?? "-"}
             IconName={LuAward}
             path="/d/grade-levels"
           />
@@ -41,23 +52,20 @@ export default function Overview() {
           <OverviewCard
             cardTitle="departments"
             cardColor="#2A9290"
-            count={getDeptCount()}
+            count={stats?.deptCount ?? "-"}
             IconName={LuBuilding}
           />
           {/* grade levels */}
           <OverviewCard
             cardTitle="graded employees"
             cardColor="#2A9290"
-            count={
-              employees.filter((staff) => staff.grade !== "no grade assigned")
-                .length
-            }
+            count={stats?.assignedEmployees ?? "-"}
             IconName={FiUserCheck}
           />
         </div>
       </div>
       {/* notification */}
-      {employees.length === 0 && (
+      {stats?.numOfEmployees === 0 && (
         <EmptySet text="No employees added yet. Head to the Employees page to add your first." />
       )}
     </section>

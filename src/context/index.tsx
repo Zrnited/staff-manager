@@ -1,29 +1,22 @@
 /* eslint-disable react-refresh/only-export-components */
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import type { Employee, GradeLevel, User } from "../types";
-import { getStorage, setStorage } from "../utils";
 
 interface AppContextTypes {
-  employees: Employee[];
-  gradeLevels: GradeLevel[];
-  setEmployees: React.Dispatch<React.SetStateAction<Employee[]>>;
-  setGradeLevels: React.Dispatch<React.SetStateAction<GradeLevel[]>>;
-  user: User | undefined;
-  setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
+  employees: Employee[] | null;
+  gradeLevels: GradeLevel[] | null;
+  setEmployees: React.Dispatch<React.SetStateAction<Employee[] | null>>;
+  setGradeLevels: React.Dispatch<React.SetStateAction<GradeLevel[] | null>>;
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const defaultContextValues: AppContextTypes = {
-  employees: [],
-  gradeLevels: [],
+  employees: null,
+  gradeLevels: null,
   setEmployees: () => {},
   setGradeLevels: () => {},
-  user: undefined,
+  user: null,
   setUser: () => {},
 };
 
@@ -31,38 +24,13 @@ const AppContext = createContext<AppContextTypes>(defaultContextValues);
 
 export const ContextProvider = ({ children }: { children: ReactNode }) => {
   //onboarding
-  const [user, setUser] = useState(() => {
-    const exisUser: User | null = getStorage("user");
-    return exisUser ? exisUser : undefined;
-  });
+  const [user, setUser] = useState<User | null>(null);
 
   //employee list state
-  const [employees, setEmployees] = useState(() => {
-    const exisEmployees: Employee[] | null = getStorage("employees");
-    return exisEmployees ? exisEmployees : [];
-  });
+  const [employees, setEmployees] = useState<Employee[] | null>(null);
 
   //grade level list state
-  const [gradeLevels, setGradeLevels] = useState(() => {
-    const exisGrades: GradeLevel[] | null = getStorage("gradeLevels");
-    return exisGrades ? exisGrades : [];
-  });
-
-  //handle user state change sync with local storage
-  useEffect(() => {
-    if (!user) return;
-    setStorage("user", user);
-  }, [user]);
-
-  //handle employee state change sync with local storage
-  useEffect(() => {
-    setStorage("employees", employees);
-  }, [employees]);
-
-  //handle grade levels state change sync with local storage
-  useEffect(() => {
-    setStorage("gradeLevels", gradeLevels);
-  }, [gradeLevels]);
+  const [gradeLevels, setGradeLevels] = useState<GradeLevel[] | null>(null);
 
   const value = {
     employees,

@@ -1,13 +1,13 @@
 import type { ReactNode } from "react";
-import Cookies from "js-cookie";
 import { Navigate } from "react-router-dom";
+import { useAppContext } from "../context";
 
 type ProtectedRouteProps = {
   children: ReactNode;
 };
 
 export function AdminAuth({ children }: ProtectedRouteProps) {
-  const token = Cookies.get("sessionId");
+  const { user } = useAppContext();
 
-  return token ? <>{children}</> : <Navigate to="/" replace />;
+  return user ? <>{children}</> : <Navigate to="/" replace />;
 }

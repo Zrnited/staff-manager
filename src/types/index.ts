@@ -2,9 +2,9 @@ import type { IconType } from "react-icons/lib";
 
 export type User = {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  password: string;
 };
 
 export type LoginForm = {
@@ -21,13 +21,14 @@ export type NavLinks = {
 export type Employee = {
   id: string;
   name: string;
-  role: string;
+  position: string;
   department: string;
   country: string;
   state: string;
   address: string;
-  grade: string;
+  gradeLevel: { id: string; name: string } | null;
   createdAt: string;
+  updatedAt: string;
 };
 
 export type EmployeeForm = {
@@ -44,7 +45,9 @@ export type GradeLevel = {
   id: string;
   name: string;
   description: string;
+  employees: { id: string; name: string }[] | null;
   createdAt: string;
+  updatedAt: string;
 };
 
 export type EmployeePageModals = {
@@ -74,4 +77,13 @@ export type Country = {
 export type SearchFunctionality = {
   keyword: string;
   grade: string;
+};
+
+export type Stats = {
+  numOfEmployees: number;
+  numOfGradeLevels: number;
+  deptCount: number;
+  assignedEmployees: number;
+  totalEmployees: number;
+  unassignedEmployees: number;
 };

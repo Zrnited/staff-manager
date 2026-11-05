@@ -1,11 +1,11 @@
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useAppContext } from "../context";
 import { useState } from "react";
-import type { LoginForm, User } from "../types";
+import type { LoginForm } from "../types";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { setCookie } from "../utils";
-import { v4 as uuidv4 } from "uuid";
+import { signin } from "../api/auth";
+import type { ApiError } from "../lib/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -15,14 +15,7 @@ export default function Login() {
     password: "",
   });
   const [showPass, setShowPass] = useState<boolean>(false);
-  const userId = uuidv4();
-
-  const accesscred: User = {
-    id: userId,
-    name: "Chief HR Manager",
-    email: "admin@email.com",
-    password: "123456",
-  };
+  const [isLoading, setIsLoading] = useState<boolean>();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -30,22 +23,17 @@ export default function Login() {
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (
-      form.email !== accesscred.email ||
-      form.password !== accesscred.password
-    ) {
-      toast.error("Invalid Credentials");
-      return;
-    }
-
-    //dynamic ID
-    const id = uuidv4();
-
-    setCookie("sessionId", id);
-    setUser(accesscred);
-    navigate("/d", { replace: true });
-    toast.success("Login successful");
+    await signin(form.email, form.password)
+      .then((res) => {
+        setUser(res.data);
+        toast.success(res.message ? res.message : "Login successful");
+        navigate("/d", { replace: true });
+      })
+      .catch((e) => {
+        const err = e as ApiError;
+        toast.error(err.message);
+      })
+      .finally(() => setIsLoading(false));
   };
 
   return (
@@ -91,10 +79,10 @@ export default function Login() {
           </button>
         </div>
         <button
-          disabled={!form.email || !form.password}
+          disabled={!form.email || !form.password || isLoading}
           className="w-full h-12.5 rounded-xl bg-[#2A9290] hover:bg-[#242d3b] text-white focus:outline-none mt-5 cursor-pointer transition ease-in-out delay-100 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          Sign In
+          {isLoading ? "Signing in..." : "Sign In"}
         </button>
         <div className="flex items-center gap-x-1 justify-center mt-1.5 lg:mt-3 text-sm lg:text-base">
           <p>© 2026 All Right Reserved</p>
