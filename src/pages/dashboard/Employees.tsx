@@ -21,10 +21,9 @@ import DeleteConfirmation from "../../components/modals/employees-page/DeleteCon
 import { toast } from "sonner";
 import EmptySet from "../../components/ui/EmptySet";
 import { getAllCountries } from "../../api/getCountries";
-import { getEmployees } from "../../api/employees";
+import { createEmployee, getEmployees } from "../../api/employees";
 import type { ApiError } from "../../lib/api";
 import { getGradeLevels } from "../../api/grade-levels";
-// import { createEmployee } from "../../api/employees/createEmployee";
 
 interface EmployeeHandler {
   data: Employee[] | null;
@@ -38,11 +37,24 @@ interface GradeLevelHandler {
   isError: string | null;
 }
 
+interface ActivityLoadingStates {
+  isAddingEmployee: boolean;
+  isEditingEmployee: boolean;
+  isDeletingEmployee: boolean;
+  isViewingEmployee: boolean;
+}
+
 export default function Employees() {
   const [modals, setModals] = useState<EmployeePageModals>({
     addEmployee: false,
     viewEmployee: false,
     deleteEmployee: false,
+  });
+  const [loaders, setLoaders] = useState<ActivityLoadingStates>({
+    isAddingEmployee: false,
+    isDeletingEmployee: false,
+    isEditingEmployee: false,
+    isViewingEmployee: false,
   });
   const [employeeForm, setEmployeeForm] = useState<EmployeeForm>({
     name: "",
@@ -58,13 +70,11 @@ export default function Employees() {
     isError: null,
     isLoading: true,
   });
-  console.log("Employees: ", employees.data);
   const [gradeLevels, setGradeLevels] = useState<GradeLevelHandler>({
     data: null,
     isError: null,
     isLoading: true,
   });
-  console.log("Grade Levels: ", gradeLevels.data);
 
   const [employee, setEmployee] = useState<Employee>();
   const [data, setData] = useState<Employee[]>([]);
@@ -135,7 +145,7 @@ export default function Employees() {
     });
   };
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     //update list
@@ -154,19 +164,45 @@ export default function Employees() {
     }
 
     //create new employee
-
-    //notify
-    toast.success("You've successfully added an employee.");
-
-    //close modal and reset form
-    setModals((prevState) => {
-      return {
-        ...prevState,
-        addEmployee: false,
-      };
-    });
-
-    resetEmployeeForm();
+    const {
+      name,
+      role: position,
+      department,
+      country,
+      state,
+      address,
+      grade,
+    } = employeeForm;
+    setLoaders((prev) => ({ ...prev, isAddingEmployee: true }));
+    await createEmployee(
+      name,
+      position,
+      department,
+      country,
+      state,
+      address,
+      grade === "no grade assigned" ? undefined : grade,
+    )
+      .then((res) => {
+        console.log("add employee res: ", res);
+        //notify
+        toast.success(
+          res.message ? res.message : "Employee added to record successfully",
+        );
+        //close modal and reset form
+        setModals((prevState) => {
+          return {
+            ...prevState,
+            addEmployee: false,
+          };
+        });
+        fetchEmployees();
+        resetEmployeeForm();
+      })
+      .catch((err: ApiError) => toast.error(err.message))
+      .finally(() =>
+        setLoaders((prev) => ({ ...prev, isAddingEmployee: false })),
+      );
 
     if (employee) setEmployee(undefined);
   };
@@ -207,7 +243,7 @@ export default function Employees() {
   }, [employees]);
 
   useEffect(() => {
-    if(!employees.data) return;
+    if (!employees.data) return;
     //filter by default
     if (search.keyword === "" && search.grade === "all") {
       setData(employees.data);
@@ -232,7 +268,9 @@ export default function Employees() {
       return;
     }
     //grade alone
-    const results = employees.data?.filter((staff) => staff.gradeLevel?.id === search.grade);
+    const results = employees.data?.filter(
+      (staff) => staff.gradeLevel?.id === search.grade,
+    );
     setData(results);
   }, [search]);
 
@@ -295,7 +333,7 @@ export default function Employees() {
             <option value={"all"}>All Grades</option>
             {gradeLevels.data?.map((grade, index) => {
               return (
-                <option key={index} value={grade.name}>
+                <option key={index} value={grade.id}>
                   {grade.name}
                 </option>
               );
@@ -331,6 +369,8 @@ export default function Employees() {
           handleSubmit={handleSubmit}
           employee={employee}
           resetEmployeeForm={resetEmployeeForm}
+          gradeLevels={gradeLevels.data ?? []}
+          isLoading={loaders.isAddingEmployee}
         />
       )}
       {/* view an existing employee */}

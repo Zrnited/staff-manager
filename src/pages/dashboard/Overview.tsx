@@ -6,6 +6,7 @@ import SectionHeader from "../../components/ui/SectionHeader";
 import { getStats } from "../../api/employees";
 import { useEffect, useState } from "react";
 import type { Stats } from "../../types";
+import ErrorWrapper from "../../components/ui/error-wrapper";
 
 export default function Overview() {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -14,7 +15,7 @@ export default function Overview() {
 
   const fetchStats = async () => {
     await getStats()
-      .then((res) => (setStats(res.data), console.log("Stats: ", res)))
+      .then((res) => setStats(res.data))
       .catch(() => setGetStatsErr(true))
       .finally(() => setIsFetchingStats(false));
   };
@@ -36,7 +37,7 @@ export default function Overview() {
           <OverviewCard
             cardTitle="total employees"
             cardColor="#2A9290"
-            count={stats?.numOfEmployees ?? "-"}
+            count={isFetchingStats ? "-" : (stats?.numOfEmployees ?? "-")}
             IconName={LuUsers}
             path="/d/employees"
           />
@@ -44,7 +45,7 @@ export default function Overview() {
           <OverviewCard
             cardTitle="grade levels"
             cardColor="#F1BE0E"
-            count={stats?.numOfGradeLevels ?? "-"}
+            count={isFetchingStats ? "-" : (stats?.numOfGradeLevels ?? "N/A")}
             IconName={LuAward}
             path="/d/grade-levels"
           />
@@ -52,14 +53,14 @@ export default function Overview() {
           <OverviewCard
             cardTitle="departments"
             cardColor="#2A9290"
-            count={stats?.deptCount ?? "-"}
+            count={isFetchingStats ? "-" : (stats?.deptCount ?? "-")}
             IconName={LuBuilding}
           />
           {/* grade levels */}
           <OverviewCard
             cardTitle="graded employees"
             cardColor="#2A9290"
-            count={stats?.assignedEmployees ?? "-"}
+            count={isFetchingStats ? "-" : (stats?.assignedEmployees ?? "-")}
             IconName={FiUserCheck}
           />
         </div>
@@ -68,6 +69,7 @@ export default function Overview() {
       {stats?.numOfEmployees === 0 && (
         <EmptySet text="No employees added yet. Head to the Employees page to add your first." />
       )}
+      {getStatsErr && <ErrorWrapper text="Failed to get stats." />}
     </section>
   );
 }

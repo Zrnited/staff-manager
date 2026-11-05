@@ -1,11 +1,11 @@
 import { AiOutlineClose } from "react-icons/ai";
 import Input from "../../ui/Input";
 import { BsChevronDown } from "react-icons/bs";
-import { useAppContext } from "../../../context";
 import type {
   Employee,
   EmployeeForm,
   EmployeePageModals,
+  GradeLevel,
 } from "../../../types";
 
 interface Props {
@@ -19,6 +19,8 @@ interface Props {
   setEmployee: React.Dispatch<React.SetStateAction<Employee | undefined>>;
   resetEmployeeForm: () => void;
   countries: string[];
+  gradeLevels: GradeLevel[];
+  isLoading: boolean;
 }
 
 export default function AddNewEmployee({
@@ -30,6 +32,8 @@ export default function AddNewEmployee({
   employee,
   resetEmployeeForm,
   countries,
+  gradeLevels,
+  isLoading
 }: Props) {
   const closeModal = () => {
     setModals((prevState) => {
@@ -43,7 +47,7 @@ export default function AddNewEmployee({
       resetEmployeeForm();
     }
   };
-  const { gradeLevels } = useAppContext();
+
   return (
     <div className="w-full h-screen fixed top-0 bottom-0 left-0 right-0 z-20">
       <div className="w-full h-full flex flex-col gap-y-1 justify-center items-center right-0 bg-[#000000]/70 backdrop-blur-md">
@@ -142,7 +146,7 @@ export default function AddNewEmployee({
                   <option value={"no grade assigned"}>Assign later</option>
                   {gradeLevels.map((level, index) => {
                     return (
-                      <option key={index} value={level.name}>
+                      <option key={index} value={level.id}>
                         {level.name}
                       </option>
                     );
@@ -166,11 +170,11 @@ export default function AddNewEmployee({
                   !employeeForm.country ||
                   !employeeForm.department ||
                   !employeeForm.name ||
-                  !employeeForm.state
+                  !employeeForm.state || isLoading
                 }
                 className="w-full capitalize h-full rounded-xl bg-[#2A9290] hover:bg-[#242d3b] text-white focus:outline-none cursor-pointer transition ease-in-out delay-100 disabled:bg-gray-300 disabled:cursor-not-allowed md:w-[60%]"
               >
-                {employee ? "update employee" : "add employee"}
+                {isLoading ? "submitting" : "submit"}
               </button>
             </div>
           </form>
