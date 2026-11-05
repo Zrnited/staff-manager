@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { useAppContext } from "../../context";
 import type {
   Country,
   Employee,
   EmployeeForm,
   EmployeePageModals,
+  GradeLevel,
   SearchFunctionality,
 } from "../../types";
 import Button from "../../components/ui/Button";
@@ -22,7 +21,22 @@ import DeleteConfirmation from "../../components/modals/employees-page/DeleteCon
 import { toast } from "sonner";
 import EmptySet from "../../components/ui/EmptySet";
 import { getAllCountries } from "../../api/getCountries";
+import { getEmployees } from "../../api/employees";
+import type { ApiError } from "../../lib/api";
+import { getGradeLevels } from "../../api/grade-levels";
 // import { createEmployee } from "../../api/employees/createEmployee";
+
+interface EmployeeHandler {
+  data: Employee[] | null;
+  isLoading: boolean;
+  isError: string | null;
+}
+
+interface GradeLevelHandler {
+  data: GradeLevel[] | null;
+  isLoading: boolean;
+  isError: string | null;
+}
 
 export default function Employees() {
   const [modals, setModals] = useState<EmployeePageModals>({
@@ -30,7 +44,6 @@ export default function Employees() {
     viewEmployee: false,
     deleteEmployee: false,
   });
-  const { employees, setEmployees, gradeLevels } = useAppContext();
   const [employeeForm, setEmployeeForm] = useState<EmployeeForm>({
     name: "",
     role: "",
@@ -40,6 +53,19 @@ export default function Employees() {
     address: "",
     grade: "no grade assigned",
   });
+  const [employees, setEmployees] = useState<EmployeeHandler>({
+    data: null,
+    isError: null,
+    isLoading: true,
+  });
+  console.log("Employees: ", employees.data);
+  const [gradeLevels, setGradeLevels] = useState<GradeLevelHandler>({
+    data: null,
+    isError: null,
+    isLoading: true,
+  });
+  console.log("Grade Levels: ", gradeLevels.data);
+
   const [employee, setEmployee] = useState<Employee>();
   const [data, setData] = useState<Employee[]>([]);
   const [countries, setCountries] = useState<string[]>([]);
@@ -63,9 +89,27 @@ export default function Employees() {
       });
   };
 
-  // const AddEmployee = async () => {
-  //   await createEmployee()
-  // }
+  const fetchEmployees = async () => {
+    await getEmployees()
+      .then((res) => {
+        setEmployees((prev) => ({ ...prev, data: res.data }));
+      })
+      .catch((error: ApiError) =>
+        setEmployees((prev) => ({ ...prev, isError: error.message })),
+      )
+      .finally(() => setEmployees((prev) => ({ ...prev, isLoading: false })));
+  };
+
+  const fetchGradeLevels = async () => {
+    await getGradeLevels()
+      .then((res) => {
+        setGradeLevels((prev) => ({ ...prev, data: res.data }));
+      })
+      .catch((error: ApiError) =>
+        setGradeLevels((prev) => ({ ...prev, isError: error.message })),
+      )
+      .finally(() => setGradeLevels((prev) => ({ ...prev, isLoading: false })));
+  };
 
   const resetEmployeeForm = () => {
     setEmployeeForm({
@@ -96,21 +140,7 @@ export default function Employees() {
 
     //update list
     if (employee) {
-      const updatedEmployeesList = employees.map((staff) =>
-        staff.id === employee.id
-          ? {
-              ...employee,
-              name: employeeForm.name,
-              role: employeeForm.role,
-              department: employeeForm.department,
-              country: employeeForm.country,
-              state: employeeForm.state,
-              address: employeeForm.address,
-              grade: employeeForm.grade,
-            }
-          : staff,
-      );
-      setEmployees(updatedEmployeesList);
+      //do something
       setEmployee(undefined);
       resetEmployeeForm();
       setModals((prevState) => {
@@ -123,27 +153,7 @@ export default function Employees() {
       return;
     }
 
-    //assign id and date
-    const userId = uuidv4();
-    const whenCreated = new Date().toISOString();
-
-    //construct new user data
-    const newEmployee: Employee = {
-      id: userId,
-      name: employeeForm.name,
-      role: employeeForm.role,
-      department: employeeForm.department,
-      country: employeeForm.country,
-      state: employeeForm.state,
-      address: employeeForm.address,
-      grade: employeeForm.grade,
-      createdAt: whenCreated,
-    };
-
-    //add to list
-    setEmployees((prevState) => {
-      return [...prevState, newEmployee];
-    });
+    //create new employee
 
     //notify
     toast.success("You've successfully added an employee.");
@@ -163,8 +173,7 @@ export default function Employees() {
 
   const deleteEmployee = () => {
     if (!employee) return;
-    const filteredArr = employees.filter((staff) => staff.id !== employee.id);
-    setEmployees(filteredArr);
+    //do something
     setModals((prevState) => {
       return {
         ...prevState,
@@ -179,17 +188,18 @@ export default function Employees() {
     if (!employee || !modals.addEmployee) return;
     setEmployeeForm({
       name: employee.name,
-      role: employee.role,
+      role: employee.position,
       department: employee.department,
       country: employee.country,
       state: employee.state,
       address: employee.address,
-      grade: employee.grade,
+      grade: employee.gradeLevel?.name ?? "",
     });
   }, [employee]);
 
   useEffect(() => {
-    setData(employees);
+    if (!employees.data) return;
+    setData(employees.data);
     setSearch({
       keyword: "",
       grade: "all",
@@ -197,14 +207,15 @@ export default function Employees() {
   }, [employees]);
 
   useEffect(() => {
+    if(!employees.data) return;
     //filter by default
     if (search.keyword === "" && search.grade === "all") {
-      setData(employees);
+      setData(employees.data);
       return;
     }
     //filter by keyword alone
     if (search.keyword.toLowerCase() !== "" && search.grade === "all") {
-      const results = employees.filter((staff) =>
+      const results = employees.data?.filter((staff) =>
         staff.name.toLowerCase().includes(search.keyword.toLowerCase()),
       );
       setData(results);
@@ -212,21 +223,23 @@ export default function Employees() {
     }
     //filter by keyword and grade
     if (search.keyword.toLowerCase() !== "" && search.grade !== "all") {
-      const results = employees.filter(
+      const results = employees.data?.filter(
         (staff) =>
           staff.name.toLowerCase().includes(search.keyword.toLowerCase()) &&
-          staff.grade === search.grade,
+          staff.gradeLevel?.id === search.grade,
       );
       setData(results);
       return;
     }
     //grade alone
-    const results = employees.filter((staff) => staff.grade === search.grade);
+    const results = employees.data?.filter((staff) => staff.gradeLevel?.id === search.grade);
     setData(results);
   }, [search]);
 
   useEffect(() => {
     fetchCountries();
+    fetchEmployees();
+    fetchGradeLevels();
   }, []);
 
   return (
@@ -235,7 +248,7 @@ export default function Employees() {
       <div className="flex w-full flex-col gap-4 lg:flex-row lg:justify-between lg:items-center">
         <SectionHeader
           heading="employees"
-          subHeading={`${employees.length} Total Employees`}
+          subHeading={`${employees.data?.length} Total Employees`}
         />
         <Button
           onClickFunction={() =>
@@ -280,7 +293,7 @@ export default function Employees() {
             className="border border-[#E0E5EB] w-full h-12.5 rounded-md cursor-pointer px-5 appearance-none focus:outline-[#2A9290]"
           >
             <option value={"all"}>All Grades</option>
-            {gradeLevels.map((grade, index) => {
+            {gradeLevels.data?.map((grade, index) => {
               return (
                 <option key={index} value={grade.name}>
                   {grade.name}

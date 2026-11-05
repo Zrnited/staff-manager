@@ -16,7 +16,7 @@ interface Props {
 export default function Sidebar({ sidenav, setSidenav }: Props) {
   const { pathname } = useLocation();
   const { user } = useAppContext();
-  const { setEmployees, setGradeLevels, setUser } = useAppContext();
+  const { setUser } = useAppContext();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -24,8 +24,6 @@ export default function Sidebar({ sidenav, setSidenav }: Props) {
     setIsLoading(true);
     await signout()
       .then(() => {
-        setEmployees(null);
-        setGradeLevels(null);
         setUser(null);
         navigate("/", { replace: true });
       })

@@ -46,7 +46,7 @@ export default function EmployeeInfo({
                 {viewEmployee?.name}
               </h2>
               <p className="text-[#8a7d8f] capitalize text-sm lg:text-base">
-                {viewEmployee?.grade}
+                {viewEmployee?.gradeLevel?.name}
               </p>
             </div>
           </div>
@@ -56,7 +56,7 @@ export default function EmployeeInfo({
               <LuBriefcase className="text-[#8a7d8f] text-xl" />
               <div className="capitalize">
                 <p className="text-[#8a7d8f]">role</p>
-                <h3>{viewEmployee?.role}</h3>
+                <h3>{viewEmployee?.position}</h3>
               </div>
             </div>
             <div className="flex gap-x-3 items-start font-medium">

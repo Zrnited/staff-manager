@@ -1,23 +1,24 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState, type ReactNode } from "react";
-import type { Employee, GradeLevel, User } from "../types";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+import type { User } from "../types";
+import { getMe } from "../api/users";
 
 interface AppContextTypes {
-  employees: Employee[] | null;
-  gradeLevels: GradeLevel[] | null;
-  setEmployees: React.Dispatch<React.SetStateAction<Employee[] | null>>;
-  setGradeLevels: React.Dispatch<React.SetStateAction<GradeLevel[] | null>>;
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  fetchingUser: boolean;
 }
 
 const defaultContextValues: AppContextTypes = {
-  employees: null,
-  gradeLevels: null,
-  setEmployees: () => {},
-  setGradeLevels: () => {},
   user: null,
   setUser: () => {},
+  fetchingUser: true,
 };
 
 const AppContext = createContext<AppContextTypes>(defaultContextValues);
@@ -25,20 +26,28 @@ const AppContext = createContext<AppContextTypes>(defaultContextValues);
 export const ContextProvider = ({ children }: { children: ReactNode }) => {
   //onboarding
   const [user, setUser] = useState<User | null>(null);
+  const [fetchingUser, setFetchingUser] = useState<boolean>(true);
 
-  //employee list state
-  const [employees, setEmployees] = useState<Employee[] | null>(null);
+  const getUser = async (cancelled: boolean) => {
+    await getMe()
+      .then((res) => !cancelled && setUser(res.data))
+      .catch(() => !cancelled && setUser(null))
+      .finally(() => !cancelled && setFetchingUser(false));
+  };
 
-  //grade level list state
-  const [gradeLevels, setGradeLevels] = useState<GradeLevel[] | null>(null);
+  //runs every page load or refresh
+  useEffect(() => {
+    let cancelled = false;
+    getUser(cancelled);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const value = {
-    employees,
-    gradeLevels,
-    setEmployees,
-    setGradeLevels,
     user,
     setUser,
+    fetchingUser,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

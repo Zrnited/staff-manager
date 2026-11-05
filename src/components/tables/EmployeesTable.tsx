@@ -103,11 +103,11 @@ export default function EmployeesTable({
                   <h3 className="capitalize text-[#0F172A]">{staff.name}</h3>
                 </div>
               </td>
-              <td className="hidden lg:table-cell">{staff.role}</td>
+              <td className="hidden lg:table-cell">{staff.position}</td>
               <td className="hidden lg:table-cell">{staff.department}</td>
               <td className="hidden lg:table-cell">{staff.state}</td>
               <td className="hidden capitalize sm:table-cell">
-                {staff.grade === "no grade assigned" ? "-" : staff.grade}
+                {!staff.gradeLevel  ? "-" : staff.gradeLevel.name}
               </td>
               <td className="w-auto">
                 <div className="flex w-fit items-center gap-2">

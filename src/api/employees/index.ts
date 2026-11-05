@@ -15,7 +15,7 @@ export interface Employee {
   country: string;
   state: string;
   address: string;
-  gradeLevel: null | string;
+  gradeLevel: null | { id: string; name: string };
   createdAt: string;
   updatedAt: string;
 }

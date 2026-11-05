@@ -1,20 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import { useEffect, useState } from "react";
-import { useAppContext } from "../../context";
-import { deleteCookie } from "../../utils";
+import { useState } from "react";
 
 export default function DashboardLayout() {
   const [sidenav, setSidenav] = useState<boolean>(false);
-  const { user } = useAppContext();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user) return;
-    navigate("/", { replace: true });
-    deleteCookie("sessionId"); //in case cookie remains while user object is null
-  }, []);
 
   return (
     <main className="min-h-screen flex">

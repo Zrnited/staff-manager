@@ -1,6 +1,7 @@
-import { BASE, type GradeLevel } from ".";
+import { BASE } from ".";
 import { api } from "../../lib/api";
 import type { ApiResponse } from "../../types/shared";
+import type { GradeLevel } from "../../types";
 
 export const createGradeLevel = async (
   name: string,
