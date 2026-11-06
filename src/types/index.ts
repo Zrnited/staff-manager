@@ -38,13 +38,13 @@ export type EmployeeForm = {
   country: string;
   state: string;
   address: string;
-  grade: string;
+  gradeLevelId: string;
 };
 
 export type GradeLevel = {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   employees: { id: string; name: string }[] | null;
   createdAt: string;
   updatedAt: string;

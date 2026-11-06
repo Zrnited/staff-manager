@@ -21,9 +21,16 @@ import DeleteConfirmation from "../../components/modals/employees-page/DeleteCon
 import { toast } from "sonner";
 import EmptySet from "../../components/ui/EmptySet";
 import { getAllCountries } from "../../api/getCountries";
-import { createEmployee, getEmployees } from "../../api/employees";
+import {
+  createEmployee,
+  deleteEmployee,
+  getEmployees,
+  updateEmployee,
+} from "../../api/employees";
 import type { ApiError } from "../../lib/api";
 import { getGradeLevels } from "../../api/grade-levels";
+import ErrorWrapper from "../../components/ui/error-wrapper";
+import LoadingWrapper from "../../components/ui/loading-wrapper";
 
 interface EmployeeHandler {
   data: Employee[] | null;
@@ -63,7 +70,7 @@ export default function Employees() {
     country: "",
     state: "",
     address: "",
-    grade: "no grade assigned",
+    gradeLevelId: "",
   });
   const [employees, setEmployees] = useState<EmployeeHandler>({
     data: null,
@@ -129,7 +136,7 @@ export default function Employees() {
       country: "",
       state: "",
       address: "",
-      grade: "no grade assigned",
+      gradeLevelId: "",
     });
   };
 
@@ -148,18 +155,55 @@ export default function Employees() {
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    //update list
+    //update employee
     if (employee) {
+      const {
+        name,
+        role: position,
+        department,
+        country,
+        state,
+        address,
+        gradeLevelId,
+      } = employeeForm;
+      const payload: Partial<
+        Omit<Employee, "createdAt" | "updatedAt" | "id" | "gradeLevel">
+      > = {
+        name,
+        position,
+        department,
+        country,
+        state,
+        address,
+      };
       //do something
-      setEmployee(undefined);
-      resetEmployeeForm();
-      setModals((prevState) => {
-        return {
-          ...prevState,
-          addEmployee: false,
-        };
-      });
-      toast.success("Employee information updated successfully");
+      (setLoaders((prev) => ({ ...prev, isEditingEmployee: true })),
+        await updateEmployee(
+          employee.id,
+          payload,
+          gradeLevelId.trim() ? gradeLevelId : null,
+        )
+          .then((res) => {
+            toast.success(
+              res.message
+                ? res.message
+                : "Employee information updated successfully",
+            );
+            setEmployee(undefined);
+            resetEmployeeForm();
+            setModals((prevState) => {
+              return {
+                ...prevState,
+                addEmployee: false,
+              };
+            });
+            fetchEmployees();
+          })
+          .catch((err: ApiError) => toast.error(err.message))
+          .finally(() =>
+            setLoaders((prev) => ({ ...prev, isEditingEmployee: false })),
+          ));
+
       return;
     }
 
@@ -171,7 +215,7 @@ export default function Employees() {
       country,
       state,
       address,
-      grade,
+      gradeLevelId,
     } = employeeForm;
     setLoaders((prev) => ({ ...prev, isAddingEmployee: true }));
     await createEmployee(
@@ -181,10 +225,9 @@ export default function Employees() {
       country,
       state,
       address,
-      grade === "no grade assigned" ? undefined : grade,
+      gradeLevelId.trim() ? gradeLevelId : undefined,
     )
       .then((res) => {
-        console.log("add employee res: ", res);
         //notify
         toast.success(
           res.message ? res.message : "Employee added to record successfully",
@@ -207,17 +250,23 @@ export default function Employees() {
     if (employee) setEmployee(undefined);
   };
 
-  const deleteEmployee = () => {
+  const eliminateEmployee = async () => {
     if (!employee) return;
     //do something
-    setModals((prevState) => {
-      return {
-        ...prevState,
-        deleteEmployee: false,
-      };
-    });
-    toast.success("Employee removed from database");
-    setEmployee(undefined);
+    setLoaders((prev) => ({ ...prev, isDeletingEmployee: true }));
+    await deleteEmployee(employee.id)
+      .then((res) => {
+        toast.success(
+          res.message ? res.message : "Employee record deleted successfully",
+        );
+        setModals((prevState) => ({ ...prevState, deleteEmployee: false }));
+        setEmployee(undefined);
+        fetchEmployees();
+      })
+      .catch((e: ApiError) => toast.error(e.message))
+      .finally(() =>
+        setLoaders((prev) => ({ ...prev, isDeletingEmployee: false })),
+      );
   };
 
   useEffect(() => {
@@ -229,7 +278,7 @@ export default function Employees() {
       country: employee.country,
       state: employee.state,
       address: employee.address,
-      grade: employee.gradeLevel?.name ?? "",
+      gradeLevelId: employee.gradeLevel?.id ?? "",
     });
   }, [employee]);
 
@@ -346,7 +395,11 @@ export default function Employees() {
       <section
         className={`mt-10 relative ${data.length === 0 ? "inherit" : "bg-white"}`}
       >
-        {data.length === 0 ? (
+        {employees.isLoading ? (
+          <LoadingWrapper text="loading employees..." />
+        ) : employees.isError ? (
+          <ErrorWrapper text="Failed to fetch employees." />
+        ) : data.length === 0 ? (
           <EmptySet
             text={`No employees added yet. Click "Add Employee Button" to get started`}
           />
@@ -370,7 +423,7 @@ export default function Employees() {
           employee={employee}
           resetEmployeeForm={resetEmployeeForm}
           gradeLevels={gradeLevels.data ?? []}
-          isLoading={loaders.isAddingEmployee}
+          isLoading={loaders.isAddingEmployee || loaders.isEditingEmployee}
         />
       )}
       {/* view an existing employee */}
@@ -386,8 +439,10 @@ export default function Employees() {
         <DeleteConfirmation
           title="Delete Employee"
           desc={`Are you sure you want to delete ${employee?.name}? This action cannot be undone.`}
-          deleteEmployee={deleteEmployee}
+          deleteEmployee={eliminateEmployee}
           setModals={setModals}
+          setEmployee={setEmployee}
+          isLoading={loaders.isDeletingEmployee}
         />
       )}
     </section>

@@ -1,12 +1,12 @@
 import { LuUsers, LuUserRoundPlus } from "react-icons/lu";
 import { RiDeleteBinLine } from "react-icons/ri";
-import { useAppContext } from "../../context";
 
 interface Props {
   name: string;
   description: string;
   handleDeleteBtnClick?: () => void;
   handleAssignEmployeeBtnClick?: () => void;
+  employees: { id: string; name: string }[];
 }
 
 export default function GradeLevelCard({
@@ -14,8 +14,8 @@ export default function GradeLevelCard({
   description,
   handleDeleteBtnClick,
   handleAssignEmployeeBtnClick,
+  employees,
 }: Props) {
-  const { employees } = useAppContext();
   return (
     <div className="border border-[#E0E5EB] bg-white rounded-lg p-5 w-full flex justify-between text-[#8a7d8f] lg:p-6">
       <div className="space-y-1">
@@ -25,9 +25,7 @@ export default function GradeLevelCard({
         <p>{description}</p>
         <div className="flex items-center gap-x-2 mt-2">
           <LuUsers />
-          <p>
-            {employees.filter((staff) => staff.grade === name).length} employees
-          </p>
+          <p>{employees.length} employee(s)</p>
         </div>
       </div>
       <div className="flex items-center h-fit gap-x-2 text-lg">

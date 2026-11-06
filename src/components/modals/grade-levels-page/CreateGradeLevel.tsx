@@ -9,6 +9,7 @@ interface Props {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement, Element>,
   ) => void;
   handleSubmit: (e: React.SubmitEvent<HTMLFormElement>) => void;
+  isLoading: boolean;
 }
 
 export default function CreateGradeLevel({
@@ -16,8 +17,10 @@ export default function CreateGradeLevel({
   gradeLevelForm,
   handleChange,
   handleSubmit,
+  isLoading,
 }: Props) {
   const closeModal = () => {
+    if (isLoading) return;
     setModals((prevState) => {
       return {
         ...prevState,
@@ -43,20 +46,20 @@ export default function CreateGradeLevel({
             {/* name & desc */}
             <div className="flex flex-col gap-y-5">
               <Input
-                label="name"
+                label="name *"
                 placeholder="e.g. LVL1"
                 type="text"
                 name="name"
                 value={gradeLevelForm.name}
                 handleChange={handleChange}
-                required={true}
+                required
               />
               <Input
                 placeholder="e.g. Entry Level"
-                label="description (optional)"
+                label="description *"
                 type="text"
                 name="description"
-                required={true}
+                required
                 value={gradeLevelForm.description}
                 handleChange={handleChange}
               />
@@ -70,10 +73,14 @@ export default function CreateGradeLevel({
                 cancel
               </div>
               <button
-                disabled={!gradeLevelForm.name || !gradeLevelForm.description}
+                disabled={
+                  !gradeLevelForm.name.trim() ||
+                  !gradeLevelForm.description.trim() ||
+                  isLoading
+                }
                 className="w-full capitalize h-full rounded-xl bg-[#2A9290] hover:bg-[#242d3b] text-white focus:outline-none cursor-pointer transition ease-in-out delay-100 disabled:bg-gray-300 disabled:cursor-not-allowed md:w-1/2"
               >
-                create
+                {isLoading ? "creating..." : "create"}
               </button>
             </div>
           </form>

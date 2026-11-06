@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { useEffect, useState } from "react";
 import { HiOutlinePlus } from "react-icons/hi";
 import Button from "../../components/ui/Button";
 import SectionHeader from "../../components/ui/SectionHeader";
@@ -8,17 +7,43 @@ import CreateGradeLevel from "../../components/modals/grade-levels-page/CreateGr
 import GradeLevelAssign from "../../components/modals/grade-levels-page/GradeLevelAssign";
 import GradeLevelCard from "../../components/ui/GradeLevelCard";
 import type {
+  Employee,
   GradeLevel,
   GradeLevelForm,
   GradeLevelsModals,
 } from "../../types";
-import { useAppContext } from "../../context";
 import { toast } from "sonner";
 import DeleteConfirmation from "../../components/modals/grade-levels-page/DeleteConfirmation";
+import type { ApiError } from "../../lib/api";
+import {
+  assignEmployee,
+  createGradeLevel,
+  deleteGradeLevel,
+  getGradeLevels,
+} from "../../api/grade-levels";
+import { getEmployees } from "../../api/employees";
+import ErrorWrapper from "../../components/ui/error-wrapper";
+import LoadingWrapper from "../../components/ui/loading-wrapper";
+
+interface EmployeeHandler {
+  data: Employee[] | null;
+  isLoading: boolean;
+  isError: string | null;
+}
+
+interface GradeLevelHandler {
+  data: GradeLevel[] | null;
+  isLoading: boolean;
+  isError: string | null;
+}
+
+interface Loaders {
+  isCreatingGL: boolean;
+  isAddingStaff: boolean;
+  isDeletingGL: boolean;
+}
 
 export default function GradeLevels() {
-  const { gradeLevels, setGradeLevels, employees, setEmployees } =
-    useAppContext();
   const [modals, setModals] = useState<GradeLevelsModals>({
     assignEmployee: false,
     createGradeLevel: false,
@@ -28,8 +53,47 @@ export default function GradeLevels() {
     name: "",
     description: "",
   });
-  const [gradeLevel, setGradeLevel] = useState<GradeLevel>();
-  const [selEmployeeId, setSelEmployeeId] = useState<string>();
+  const [employees, setEmployees] = useState<EmployeeHandler>({
+    data: null,
+    isError: null,
+    isLoading: true,
+  });
+  const [gradeLevels, setGradeLevels] = useState<GradeLevelHandler>({
+    data: null,
+    isError: null,
+    isLoading: true,
+  });
+  const [loaders, setLoaders] = useState<Loaders>({
+    isCreatingGL: false,
+    isAddingStaff: false,
+    isDeletingGL: false,
+  });
+  const [gradeLevel, setGradeLevel] = useState<GradeLevel | null>(null);
+  const [selEmployeeId, setSelEmployeeId] = useState<string | null>(null);
+
+  const fetchEmployees = async () => {
+    await getEmployees()
+      .then((res) => {
+        setEmployees((prev) => ({ ...prev, data: res.data }));
+      })
+      .catch((error: ApiError) =>
+        setEmployees((prev) => ({ ...prev, isError: error.message })),
+      )
+      .finally(() => setEmployees((prev) => ({ ...prev, isLoading: false })));
+  };
+
+  const fetchGradeLevels = async () => {
+    if (!gradeLevels.isLoading)
+      setGradeLevels((prev) => ({ ...prev, isLoading: true }));
+    await getGradeLevels()
+      .then((res) => {
+        setGradeLevels((prev) => ({ ...prev, data: res.data }));
+      })
+      .catch((error: ApiError) =>
+        setGradeLevels((prev) => ({ ...prev, isError: error.message })),
+      )
+      .finally(() => setGradeLevels((prev) => ({ ...prev, isLoading: false })));
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -43,96 +107,75 @@ export default function GradeLevels() {
     });
   };
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    //assign id and date
-    const gradeId = uuidv4();
-    const whenCreated = new Date().toISOString();
-
-    const newGradeLevel: GradeLevel = {
-      id: gradeId,
-      name: gradeLevelForm.name,
-      description: gradeLevelForm.description,
-      createdAt: whenCreated,
-    };
-
-    //add
-    setGradeLevels((prevState) => {
-      return [...prevState, newGradeLevel];
-    });
-
-    //notify
-    toast.success("You've successfully created a new grade level.");
-
-    //close
-    setModals((prevState) => {
-      return {
-        ...prevState,
-        createGradeLevel: false,
-      };
-    });
-
-    //reset
-    setGradeLevelForm({
-      name: "",
-      description: "",
-    });
+    setLoaders((prev) => ({ ...prev, isCreatingGL: true }));
+    const { name, description } = gradeLevelForm;
+    try {
+      const res = await createGradeLevel(name, description);
+      console.log("Response: ", res);
+      //notify
+      toast.success(
+        res.message ? res.message : "Grade level created successfully",
+      );
+      //close
+      setModals((prevState) => ({ ...prevState, createGradeLevel: false }));
+      //reset
+      setGradeLevelForm({
+        name: "",
+        description: "",
+      });
+      fetchGradeLevels();
+    } catch (err: any) {
+      const error = err as ApiError;
+      toast.error(error.message ? error.message : "Failed to execute");
+    } finally {
+      setLoaders((prev) => ({ ...prev, isCreatingGL: false }));
+    }
   };
 
-  const deleteGradeLevel = () => {
+  const eliminateGradeLevel = async () => {
     if (!gradeLevel) return;
-    //remove the grade level
-    const filteredArr = gradeLevels.filter(
-      (grade) => grade.id !== gradeLevel.id,
-    );
-    setGradeLevels(filteredArr);
-    //reset the affected employee grades
-    const updatedEmployeesList = employees.map((staff) =>
-      staff.grade === gradeLevel.name
-        ? {
-            ...staff,
-            grade: "no grade assigned",
-          }
-        : staff,
-    );
-    setEmployees(updatedEmployeesList);
-    //close modal
-    setModals((prevState) => {
-      return {
-        ...prevState,
-        deleteGradeLevel: false,
-      };
-    });
-    //notify
-    toast.success("Grade level deleted");
-    //reset grade level
-    setGradeLevel(undefined);
+    setLoaders((prev) => ({ ...prev, isDeletingGL: true }));
+    try {
+      const res = await deleteGradeLevel(gradeLevel.id);
+      toast.success(res.message ? res.message : "GL deleted successfully");
+      setGradeLevel(null);
+      setModals((prevState) => ({ ...prevState, deleteGradeLevel: false }));
+      fetchGradeLevels();
+    } catch (e: any) {
+      const err = e as ApiError;
+      toast.error(err.message);
+    } finally {
+      setLoaders((prev) => ({ ...prev, isDeletingGL: false }));
+    }
   };
 
-  const assignGradeLevel = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const assignGradeLevel = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!selEmployeeId || selEmployeeId === "") return;
-    if (!gradeLevel) return;
-    const updatedEmployeesList = employees.map((staff) =>
-      staff.id === selEmployeeId
-        ? {
-            ...staff,
-            grade: gradeLevel.name,
-          }
-        : staff,
-    );
-    setEmployees(updatedEmployeesList);
-    toast.success("Employee assigned to grade level");
-    setModals((prevState) => {
-      return {
-        ...prevState,
-        assignEmployee: false,
-      };
-    });
-    setGradeLevel(undefined);
-    setSelEmployeeId(undefined);
+    if (!selEmployeeId?.trim() || !gradeLevel) return;
+    setLoaders((prev) => ({ ...prev, isAddingStaff: true }));
+    try {
+      const res = await assignEmployee(gradeLevel.id, selEmployeeId);
+      toast.success(
+        res.message ? res.message : "Employee assigned to GL successfully",
+      );
+      setGradeLevel(null);
+      setSelEmployeeId(null);
+      fetchGradeLevels();
+      setModals((prevState) => ({ ...prevState, assignEmployee: false }));
+    } catch (e: any) {
+      const error = e as ApiError;
+      toast.error(error.message);
+    } finally {
+      setLoaders((prev) => ({ ...prev, isAddingStaff: false }));
+    }
   };
+
+  useEffect(() => {
+    fetchEmployees();
+    fetchGradeLevels();
+  }, []);
 
   return (
     <section className="space-y-5 lg:space-y-7 lg:px-5 lg:py-4">
@@ -144,30 +187,30 @@ export default function GradeLevels() {
         />
         <Button
           onClickFunction={() =>
-            setModals((prevState) => {
-              return {
-                ...prevState,
-                createGradeLevel: true,
-              };
-            })
+            setModals((prevState) => ({ ...prevState, createGradeLevel: true }))
           }
           btnText="create grade level"
           IconName={HiOutlinePlus}
         />
       </div>{" "}
       {/* body content */}
-      {gradeLevels.length === 0 ? (
+      {gradeLevels.isLoading ? (
+        <LoadingWrapper text="loading Grade Levels..." />
+      ) : gradeLevels.isError ? (
+        <ErrorWrapper text="Failed to get grade levels" />
+      ) : gradeLevels.data?.length === 0 ? (
         // empty list notification
         <EmptySet text="No grade levels yet. Create one to start categorizing employees." />
       ) : (
         // grade level list
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-          {gradeLevels.map((grade, index) => {
+          {gradeLevels.data?.map((grade, index) => {
             return (
               <GradeLevelCard
                 key={index}
+                employees={grade.employees ?? []}
                 name={grade.name}
-                description={grade.description}
+                description={grade.description ?? "No description provided"}
                 handleDeleteBtnClick={() => {
                   setGradeLevel(grade);
                   setModals((prevState) => {
@@ -191,12 +234,14 @@ export default function GradeLevels() {
           })}
         </div>
       )}
+      {/* modals */}
       {modals.createGradeLevel && (
         <CreateGradeLevel
           handleSubmit={handleSubmit}
           handleChange={handleChange}
           setModals={setModals}
           gradeLevelForm={gradeLevelForm}
+          isLoading={loaders.isCreatingGL}
         />
       )}
       {modals.deleteGradeLevel && (
@@ -204,8 +249,9 @@ export default function GradeLevels() {
           title="Delete Grade Level"
           desc={`Delete ${gradeLevel?.name}? Employees in this grade will become unassigned.`}
           setModals={setModals}
-          deleteGradeLevel={deleteGradeLevel}
+          deleteGradeLevel={eliminateGradeLevel}
           setGradeLevel={setGradeLevel}
+          isLoading={loaders.isDeletingGL}
         />
       )}
       {modals.assignEmployee && (
@@ -215,6 +261,9 @@ export default function GradeLevels() {
           gradeLevel={gradeLevel}
           setSelEmployeeId={setSelEmployeeId}
           assignGradeLevel={assignGradeLevel}
+          employees={employees.data ?? []}
+          selEmployeeId={selEmployeeId ?? ""}
+          isLoading={loaders.isAddingStaff}
         />
       )}
     </section>

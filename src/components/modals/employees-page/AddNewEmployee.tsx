@@ -137,13 +137,12 @@ export default function AddNewEmployee({
               </label>
               <div className="relative">
                 <select
-                  name="grade"
-                  value={employeeForm.grade}
-                  required
+                  name="gradeLevelId"
+                  value={employeeForm.gradeLevelId}
                   onChange={handleChange}
                   className="h-12.5 rounded-xl border w-full border-[#E2E8F0] px-3 appearance-none cursor-pointer focus:outline-[#2A9290]"
                 >
-                  <option value={"no grade assigned"}>Assign later</option>
+                  <option value={""}>Assign later</option>
                   {gradeLevels.map((level, index) => {
                     return (
                       <option key={index} value={level.id}>

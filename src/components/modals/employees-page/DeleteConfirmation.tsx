@@ -1,10 +1,12 @@
-import type { EmployeePageModals } from "../../../types";
+import type { Employee, EmployeePageModals } from "../../../types";
 
 interface Props {
   title: string;
   desc: string;
   deleteEmployee: () => void;
   setModals: (value: React.SetStateAction<EmployeePageModals>) => void;
+  setEmployee: React.Dispatch<React.SetStateAction<Employee | undefined>>;
+  isLoading: boolean;
 }
 
 export default function DeleteConfirmation({
@@ -12,6 +14,8 @@ export default function DeleteConfirmation({
   desc,
   deleteEmployee,
   setModals,
+  setEmployee,
+  isLoading,
 }: Props) {
   return (
     <div className="w-full h-screen fixed top-0 bottom-0 left-0 right-0 z-20">
@@ -24,12 +28,14 @@ export default function DeleteConfirmation({
           <div className="flex items-center h-12.5 gap-x-2 mt-5 md:w-70 md:place-self-end">
             <div
               onClick={() => {
+                if (isLoading) return;
                 setModals((prevState) => {
                   return {
                     ...prevState,
                     deleteEmployee: false,
                   };
                 });
+                setEmployee(undefined);
               }}
               className="h-full w-full px-5 flex items-center justify-center border rounded-xl border-gray-200 capitalize hover:bg-[#2A9290]/10 transition ease-in-out delay-100 cursor-pointer font-medium md:w-1/2"
             >
@@ -37,9 +43,10 @@ export default function DeleteConfirmation({
             </div>
             <button
               onClick={deleteEmployee}
+              disabled={isLoading}
               className="w-full capitalize h-full rounded-xl bg-[#DC2828] hover:bg-[#c72424] text-white focus:outline-none cursor-pointer transition ease-in-out delay-100 disabled:bg-gray-300 disabled:cursor-not-allowed md:w-1/2"
             >
-              delete
+              {isLoading ? "deleting..." : "delete"}
             </button>
           </div>
         </div>
