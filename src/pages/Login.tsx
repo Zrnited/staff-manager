@@ -15,7 +15,7 @@ export default function Login() {
     password: "",
   });
   const [showPass, setShowPass] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -23,6 +23,7 @@ export default function Login() {
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
     await signin(form.email, form.password)
       .then((res) => {
         setUser(res.data);

@@ -22,7 +22,7 @@ export default function Register() {
     password: "",
   });
   const [showPass, setShowPass] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -42,6 +42,7 @@ export default function Register() {
 
     if (!valid) return toast.error(`Password Fixes: ${errors.join(", ")}`);
 
+    setIsLoading(true);
     await signup(firstname, lastname, email, password)
       .then((res) => {
         toast.success(res.message ? res.message : "Registration successful");
