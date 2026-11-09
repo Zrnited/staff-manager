@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { signup } from "../api/auth";
 import type { ApiError } from "../lib/api";
 import { validatePassword } from "../utils";
+import logo from "../assets/sm-logo.png";
 
 type Register = {
   firstname: string;
@@ -59,12 +60,23 @@ export default function Register() {
     <main className="min-h-screen flex items-center justify-center w-full">
       <form
         onSubmit={handleSubmit}
-        className="p-8 border border-[#E2E8F0] bg-white rounded-xl space-y-1 text-[#0F172A] m-3 sm:m-0 lg:p-10 lg:w-130"
+        className="p-8 border border-[#E2E8F0] bg-white rounded-xl space-y-1 text-[#0F172A] m-3 sm:m-0 lg:p-10 w-[90%] sm:w-100 md:w-110 lg:w-130"
       >
-        <h2 className="text-xl font-grotesk lg:text-2xl capitalize font-bold text-[#171D26]">
-          sign up to start using staff manager
-        </h2>
-        <p className="text-[#64748B] text-sm lg:text-base">
+        <div className="flex flex-col items-center gap-2 sm:flex-row">
+          <img
+            src={logo}
+            loading="lazy"
+            decoding="async"
+            alt="logo"
+            title="logo"
+            draggable={false}
+            className="w-10"
+          />
+          <h2 className="text-xl font-grotesk lg:text-2xl font-bold text-[#171D26]">
+            Registering here is FREE!
+          </h2>
+        </div>
+        <p className="text-[#64748B] text-sm lg:text-base mt-3 text-center sm:text-start">
           Kindly enter your credentials to register.
         </p>
         {/* firstName */}

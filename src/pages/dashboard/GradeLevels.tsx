@@ -31,7 +31,7 @@ interface EmployeeHandler {
   isError: string | null;
 }
 
-interface GradeLevelHandler {
+export interface GradeLevelHandler {
   data: GradeLevel[] | null;
   isLoading: boolean;
   isError: string | null;

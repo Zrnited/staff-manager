@@ -7,6 +7,7 @@ import { useState } from "react";
 import { signout } from "../../api/auth";
 import type { ApiError } from "../../lib/api";
 import { toast } from "sonner";
+import logo from "../../assets/sm-white.png"
 
 interface Props {
   sidenav: boolean;
@@ -42,9 +43,20 @@ export default function Sidebar({ sidenav, setSidenav }: Props) {
     >
       <section>
         <div className="w-full flex flex-col text-white">
-          <h2 className="font-semibold text-2xl font-grotesk">
-            <span className="text-[#2A9290]">Staff</span> Manager
-          </h2>
+          <div className="flex items-center gap-x-2">
+            <img
+              src={logo}
+              loading="lazy"
+              decoding="async"
+              alt="logo"
+              title="logo"
+              draggable={false}
+              className="w-10"
+            />
+            <h2 className="font-semibold text-2xl font-grotesk">
+              <span className="text-[#2A9290]">Staff</span> Manager
+            </h2>
+          </div>
           <hr className="h-px border-none bg-[#2A313c] w-full mt-6" />
         </div>
         {/* navlinks */}

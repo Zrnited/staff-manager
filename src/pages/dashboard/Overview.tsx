@@ -7,9 +7,27 @@ import { getStats } from "../../api/employees";
 import { useEffect, useState } from "react";
 import type { Stats } from "../../types";
 import ErrorWrapper from "../../components/ui/error-wrapper";
+import OverviewGraph from "../../components/ui/overview-graph";
+import type { ApiError } from "../../lib/api";
+import {
+  getChartMetrics,
+  type ChartMetrics,
+} from "../../api/grade-levels/get-chart-metrics";
+import LoadingWrapper from "../../components/ui/loading-wrapper";
+
+interface MetricsHandler {
+  data: ChartMetrics[] | null;
+  isError: string | null;
+  isLoading: boolean;
+}
 
 export default function Overview() {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [metrics, setMetrics] = useState<MetricsHandler>({
+    data: null,
+    isError: null,
+    isLoading: true,
+  });
   const [isFetchingStats, setIsFetchingStats] = useState<boolean>(true);
   const [getStatsErr, setGetStatsErr] = useState<boolean>(false);
 
@@ -20,8 +38,22 @@ export default function Overview() {
       .finally(() => setIsFetchingStats(false));
   };
 
+  const fetchChartMetrics = async () => {
+    if (!metrics.isLoading)
+      setMetrics((prev) => ({ ...prev, isLoading: true }));
+    await getChartMetrics()
+      .then((res) => {
+        setMetrics((prev) => ({ ...prev, data: res.data }));
+      })
+      .catch((error: ApiError) =>
+        setMetrics((prev) => ({ ...prev, isError: error.message })),
+      )
+      .finally(() => setMetrics((prev) => ({ ...prev, isLoading: false })));
+  };
+
   useEffect(() => {
     fetchStats();
+    fetchChartMetrics();
   }, []);
 
   return (
@@ -65,6 +97,16 @@ export default function Overview() {
           />
         </div>
       </div>
+
+      {/* graph */}
+      {metrics.isLoading ? (
+        <LoadingWrapper text="loading metrics" />
+      ) : metrics.isError ? (
+        <ErrorWrapper text="failed to get metrics" />
+      ) : (
+        <OverviewGraph data={metrics.data ?? []} />
+      )}
+
       {/* notification */}
       {stats?.numOfEmployees === 0 && (
         <EmptySet text="No employees added yet. Head to the Employees page to add your first." />

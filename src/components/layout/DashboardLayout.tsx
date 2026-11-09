@@ -2,6 +2,7 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { useState } from "react";
+import logo from "../../assets/sm-logo.png";
 
 export default function DashboardLayout() {
   const [sidenav, setSidenav] = useState<boolean>(false);
@@ -17,7 +18,17 @@ export default function DashboardLayout() {
       />
       <section className="flex-1 bg-[#F5F7FA] lg:overflow-hidden lg:h-screen">
         <header className="fixed left-0 right-0 top-0 flex items-center justify-center z-10 lg:hidden">
-          <nav className="w-full flex justify-end max-w-360 bg-white p-3 border-b border-[#E6E6E6]">
+          <nav className="w-full flex justify-between max-w-360 bg-white p-3 border-b border-[#E6E6E6]">
+            {/* logo */}
+            <img
+              src={logo}
+              loading="lazy"
+              decoding="async"
+              alt="logo"
+              title="logo"
+              draggable={false}
+              className="w-11"
+            />
             {/* hamburger */}
             <button
               onClick={() => setSidenav(!sidenav)}

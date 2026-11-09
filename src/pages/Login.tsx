@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import { signin } from "../api/auth";
 import type { ApiError } from "../lib/api";
+import logo from "../assets/sm-logo.png";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -43,10 +44,21 @@ export default function Login() {
         onSubmit={handleSubmit}
         className="p-8 border border-[#E2E8F0] bg-white rounded-xl space-y-1 text-[#0F172A] m-3 sm:m-0 lg:p-10 lg:w-125"
       >
-        <h2 className="text-xl font-grotesk lg:text-2xl capitalize font-bold text-[#171D26]">
-          Welcome to Staff Manager
-        </h2>
-        <p className="text-[#64748B] text-sm lg:text-base">
+        <div className="flex flex-col items-center gap-2 sm:flex-row">
+          <img
+            src={logo}
+            loading="lazy"
+            decoding="async"
+            alt="logo"
+            title="logo"
+            draggable={false}
+            className="w-10"
+          />
+          <h2 className="text-xl font-grotesk lg:text-2xl capitalize font-bold text-[#171D26]">
+            Welcome to Staff Manager
+          </h2>
+        </div>
+        <p className="text-[#64748B] text-sm lg:text-base mt-3 text-center sm:text-start">
           Kindly enter your credentials to access the platform.
         </p>
         <div className="mt-8 flex flex-col gap-y-1">
