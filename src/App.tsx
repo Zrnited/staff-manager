@@ -7,12 +7,14 @@ import DashboardLayout from "./components/layout/DashboardLayout.tsx";
 import Overview from "./pages/dashboard/Overview.tsx";
 import Employees from "./pages/dashboard/Employees.tsx";
 import GradeLevels from "./pages/dashboard/GradeLevels.tsx";
+import Register from "./pages/Register.tsx";
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route index element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="*" element={<NotFound />} />
         {/* protected routes */}
         <Route element={<DashboardLayout />}>
