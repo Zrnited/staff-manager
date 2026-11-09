@@ -113,7 +113,6 @@ export default function GradeLevels() {
     const { name, description } = gradeLevelForm;
     try {
       const res = await createGradeLevel(name, description);
-      console.log("Response: ", res);
       //notify
       toast.success(
         res.message ? res.message : "Grade level created successfully",
